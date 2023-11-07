@@ -2,7 +2,7 @@ const express = require('express')
 const userMulter = require('../config/userMulter')
 const userController = require('../controllers/userController')
 const auth = require('../middleware/auth')
-//const adminAuth = require('../middleware/authAdmin')
+const adminAuth = require('../middleware/authAdmin')
 
 const user_route = express()
 const upload = userMulter.userMulter()
@@ -24,7 +24,7 @@ user_route.get('/',userController.loadHome)
 
 user_route.get('/logout',auth.logOutSession,userController.logOut)
 
-//user_route.get('/logoutIn',adminAuth.logOutSession,userController.logOutIn)
+user_route.get('/logoutIn',adminAuth.logOutSession,userController.logOutIn)
 
 user_route.get('/otp-login',auth.loginSession,userController.otpLogin)
 
@@ -42,6 +42,7 @@ user_route.get('/singleProduct',auth.logOutSession,userController.productDetails
 
 user_route.get('/shopPage',userController.loadShopPage)
 
+user_route.post('/shopFilter',userController.productFilter)
 
 
 module.exports = user_route

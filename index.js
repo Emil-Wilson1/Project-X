@@ -1,6 +1,6 @@
 const morgan = require('morgan')
 const userRout = require('./router/userRout')
-//const adminRout = require('./router/adminRout')
+const adminRout = require('./router/adminRout')
 const bodyParser = require('body-parser')
 const session = require('express-session')
 const nocache = require('nocache')
@@ -23,7 +23,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use('/', userRout)
-//app.use('/admin', adminRout)
+app.use('/admin', adminRout)
 
 app.use((err,req,res,next)=>{
     res.status(err.status||500)
