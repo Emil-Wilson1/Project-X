@@ -27,39 +27,116 @@ const securePassword = async (password) => {
 
 ///////////SEND EMAIL VERIFICATION////////
 
-const sendVerifyMail = async (username, email, user_id) => {
+const otpSignup = async (req, res, next) => {
     try {
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.gmail.com',
-            port: 465,
-            secure: true,
-            auth: {
-                user: 'emilwilson67@gmail.com',
-                pass: process.env.EMAILPASS
-            },
-        });
-
-        const mailOption = {
-            from: 'emilwilson67@gmail.com',
-            to: email,
-            subject: 'Email verification',
-            html: `<p>Hii ${username}, please click <a href="${process.env.SITE_URL}/verify?id=${user_id}">here</a> to verify your email.</p>`,
-        };
-
-        transporter.sendMail(mailOption, (error, info) => {
-            if (error) {
-                console.log(error.message);
-                console.log('Email could not be sent');
-            } else {
-                console.log('Email has been sent:', info.response);
-            }
-        });
+        res.render('otp-login-signup', { message, msg })
+        message = null
+        msg = null
     } catch (error) {
-        console.log(error);
-        console.log('Error occurred while sending email');
+        console.log(error.message);
+        next(error.message)
     }
-};
+}
 
+let otpCheckMail
+// const verifyotpMailSignup = async (req, res, next) => {
+//     try {
+
+//         if (req.body.email.trim().length == 0) {
+//             res.redirect('/otp-login-signup');
+//             msg = 'Please fill the form';
+//         } else {
+//             otpCheckMail = req.body.email;
+//             const userData = await User.findOne({ email: otpCheckMail });
+
+//             if (userData) {
+//                 res.redirect('/otp-page-signup');
+//                 const mailtransport = nodemailer.createTransport({
+//                     host: 'smtp.gmail.com',
+//                     port: 465,
+//                     secure: true,
+//                     auth: {
+//                         user: 'emilwilson67@gmail.com',
+//                         pass: process.env.EMAILPASS,
+//                     },
+//                 });
+
+//                 otp = otpgen();
+//                 let details = {
+//                     from: "emilwilson67@gmail.com",
+//                     to: otpCheckMail,
+//                     subject: "Classy Fashion Club",
+//                     text: otp + " is your Classy Fashion Club verification code. Do not share OTP with anyone "
+//                 };
+
+//                 mailtransport.sendMail(details, (err) => {
+//                     if (err) {
+//                         console.log(err);
+//                     } else {
+//                         console.log("success");
+//                     }
+//                 });
+//             } else {
+//                 res.redirect('/otp-login-signup');
+//                 msg = 'error';
+//             }
+            
+//         }
+//     } catch (error) {
+//         console.log(error.message);
+//         next(error.message);
+//     }
+// };
+
+
+
+const otpSignSubmit = async (req, res, next) => {
+    try {
+        res.render('otp-page-signup', { message, msg })
+        message = null
+        msg = null
+    } catch (error) {
+        console.log(error.message);
+        next(error.message)
+    }
+}
+
+
+
+const otpVerifySignup = async (req, res, next) => {
+    try {
+        if (req.body.otp.trim().length == 0) {
+            res.redirect('/otp-page-signup')
+            msg = 'Please Enter OTP'
+        } else {
+            const OTP = req.body.otp
+            if (regex_otp.test(OTP) == false) {
+                res.redirect('/otp-page-signup')
+                msg = 'Only numbers allowed'
+            } else if (otp == OTP) {
+                await User.updateOne({ email: otpCheckMail }, { $set: { is_verified: 1 } })
+                res.render('email_verified')
+            } else {
+                res.redirect('/otp-page-signup')
+                msg = 'OTP is incorrect'
+            }
+        }
+    } catch (error) {
+        console.log(error.message);
+        next(error.message)
+    }
+}
+
+const emailVerified = async (req,res,next)=>{
+    try {
+        res.render('email_verified', { message, msg })
+        message = null
+        msg = null
+    } catch (error) {
+        console.log(error.message);
+        next(error.message)
+    }
+}
 /////////USER SUIGNUP//////////
 
 const userSignup = async (req, res, next) => {
@@ -81,6 +158,7 @@ const insertUser = async (req, res, next) => {
     let user
     const checkMail = await User.findOne({ email: usd.email })
     const checkMob = await User.findOne({ phone: usd.phone })
+    otpCheckMail=req.body.email;
 
     try {
         if (!usd.email && !usd.phone && !usd.password && !usd.username) {
@@ -128,9 +206,36 @@ const insertUser = async (req, res, next) => {
         const userData = await user.save()
 
         if (userData) {
-            sendVerifyMail(usd.username, usd.email, userData._id)
-            res.redirect('/login')
-            message = 'Registration successfull.Please verify your Email'
+           
+            res.redirect('/otp-page-signup');
+            message = 'Please Check Your Mail !'
+                const mailtransport = nodemailer.createTransport({
+                    host: 'smtp.gmail.com',
+                    port: 465,
+                    secure: true,
+                    auth: {
+                        user: 'emilwilson67@gmail.com',
+                        pass: process.env.EMAILPASS,
+                    },
+                });
+
+                otp = otpgen();
+                let details = {
+                    from: "emilwilson67@gmail.com",
+                    to: otpCheckMail,
+                    subject: "FINITO Fashion Club",
+                    text: otp + " is your Classy Fashion Club verification code. Do not share OTP with anyone "
+                };
+
+                mailtransport.sendMail(details, (err) => {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        console.log("success");
+                    }
+                });
+           
+           
         } else {
             res.redirect('/signup')
             msg = 'Registration failed'
@@ -253,15 +358,15 @@ const logOutIn = async (req, res) => {
 
 /////////EMAIL VERIFICATION////////////
 
-const verifyMail = async (req, res, next) => {
-    try {
-        await User.updateOne({ _id: req.query.id }, { $set: { is_verified: 1 } })
-        res.render('email_verified')
-    } catch (error) {
-        console.log(error.message);
-        next(error.message)
-    }
-}
+// const verifyMail = async (req, res, next) => {
+//     try {
+//         await User.updateOne({ _id: req.query.id }, { $set: { is_verified: 1 } })
+//         res.render('email_verified')
+//     } catch (error) {
+//         console.log(error.message);
+//         next(error.message)
+//     }
+// }
 
 
 ///////////////OTP LOGIN///////////////
@@ -527,7 +632,6 @@ const productFilter = async (req, res, next) => {
 module.exports = {
     userSignup,
     insertUser,
-    verifyMail,
     loginUser,
     verifyLogin,
     loadHome,
@@ -540,4 +644,8 @@ module.exports = {
     productDetails,
     loadShopPage,
     productFilter,
+    otpSignup,
+    otpSignSubmit,
+    otpVerifySignup,
+    emailVerified,
 }

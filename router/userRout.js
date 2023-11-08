@@ -16,7 +16,7 @@ user_route.post('/signup',auth.loginSession,userController.insertUser)
 
 user_route.get('/login',auth.loginSession,userController.loginUser)
 
-user_route.get('/verify',auth.loginSession,userController.verifyMail)
+//user_route.get('/verify',auth.loginSession,userController.verifyMail)
 
 user_route.post('/login',auth.loginSession,userController.verifyLogin)
 
@@ -28,9 +28,17 @@ user_route.get('/logoutIn',adminAuth.logOutSession,userController.logOutIn)
 
 user_route.get('/otp-login',auth.loginSession,userController.otpLogin)
 
+user_route.get('/otp-login-signup',auth.loginSession,userController.otpSignup)
+
+user_route.get('/otp-page-signup',auth.loginSession,userController.otpSignSubmit)
+
 user_route.get('/otpVerifyMail',auth.loginSession,userController.verifyotpMail)
 
-user_route.post('/otpVerifyMail',auth.loginSession,userController.verifyotpMail)
+//user_route.post('/otpVerifyMail',auth.loginSession,userController.verifyotpMail)
+
+user_route.post('/otpSubmitMail',auth.loginSession,userController.otpVerifySignup)
+
+user_route.get('/email_verified',auth.logOutSession,userController.emailVerified)
 
 user_route.get('/otp-page',auth.loginSession,userController.otppage)
 
