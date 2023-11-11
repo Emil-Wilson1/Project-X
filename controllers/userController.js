@@ -13,7 +13,7 @@ const regex_mobile = /^\d{10}$/
 let message
 let msg
 
-
+let otpCheckMail
 //////////SECURE PASSWORD////////////
 
 const securePassword = async (password) => {
@@ -24,70 +24,6 @@ const securePassword = async (password) => {
         console.log(error.message);
     }
 }
-
-///////////SEND EMAIL VERIFICATION////////
-
-const otpSignup = async (req, res, next) => {
-    try {
-        res.render('otp-login-signup', { message, msg })
-        message = null
-        msg = null
-    } catch (error) {
-        console.log(error.message);
-        next(error.message)
-    }
-}
-
-let otpCheckMail
-// const verifyotpMailSignup = async (req, res, next) => {
-//     try {
-
-//         if (req.body.email.trim().length == 0) {
-//             res.redirect('/otp-login-signup');
-//             msg = 'Please fill the form';
-//         } else {
-//             otpCheckMail = req.body.email;
-//             const userData = await User.findOne({ email: otpCheckMail });
-
-//             if (userData) {
-//                 res.redirect('/otp-page-signup');
-//                 const mailtransport = nodemailer.createTransport({
-//                     host: 'smtp.gmail.com',
-//                     port: 465,
-//                     secure: true,
-//                     auth: {
-//                         user: 'emilwilson67@gmail.com',
-//                         pass: process.env.EMAILPASS,
-//                     },
-//                 });
-
-//                 otp = otpgen();
-//                 let details = {
-//                     from: "emilwilson67@gmail.com",
-//                     to: otpCheckMail,
-//                     subject: "Classy Fashion Club",
-//                     text: otp + " is your Classy Fashion Club verification code. Do not share OTP with anyone "
-//                 };
-
-//                 mailtransport.sendMail(details, (err) => {
-//                     if (err) {
-//                         console.log(err);
-//                     } else {
-//                         console.log("success");
-//                     }
-//                 });
-//             } else {
-//                 res.redirect('/otp-login-signup');
-//                 msg = 'error';
-//             }
-            
-//         }
-//     } catch (error) {
-//         console.log(error.message);
-//         next(error.message);
-//     }
-// };
-
 
 
 const otpSignSubmit = async (req, res, next) => {
@@ -224,7 +160,7 @@ const insertUser = async (req, res, next) => {
                     from: "emilwilson67@gmail.com",
                     to: otpCheckMail,
                     subject: "FINITO Fashion Club",
-                    text: otp + " is your Classy Fashion Club verification code. Do not share OTP with anyone "
+                    text: otp + " is your Finito Fashion Club verification code. Do not share OTP with anyone "
                 };
 
                 mailtransport.sendMail(details, (err) => {
@@ -338,7 +274,7 @@ const productDetails = async (req, res, next) => {
     }
 }
 
-////////////LOAD USER PROFILE PAGE/////////
+
 
 
 
@@ -356,17 +292,6 @@ const logOutIn = async (req, res) => {
     res.redirect('/admin/userData')
 }
 
-/////////EMAIL VERIFICATION////////////
-
-// const verifyMail = async (req, res, next) => {
-//     try {
-//         await User.updateOne({ _id: req.query.id }, { $set: { is_verified: 1 } })
-//         res.render('email_verified')
-//     } catch (error) {
-//         console.log(error.message);
-//         next(error.message)
-//     }
-// }
 
 
 ///////////////OTP LOGIN///////////////
@@ -434,8 +359,8 @@ const verifyotpMail = async (req, res, next) => {
                             let details = {
                                 from: "emilwilson67@gmail.com",
                                 to: otpChechMail,
-                                subject: "Classy Fashion Club",
-                                text: otp + " is your Classy Fashion Club verification code. Do not share OTP with anyone "
+                                subject: "Finito Fashion Club",
+                                text: otp + " is your Finito Fashion Club verification code. Do not share OTP with anyone "
                             }
                             mailtransport.sendMail(details, (err) => {
                                 if (err) {
@@ -493,7 +418,7 @@ const otpVerify = async (req, res, next) => {
     }
 }
 
-//////LOAD CART PAGE///////
+
 
 
 ////////////LOAD SHOP PAGE/////////////
@@ -518,114 +443,6 @@ const loadShopPage = async (req, res, next) => {
 }
 
 
-///////////PRODUCT FILTER///////////
-
-const productFilter = async (req, res, next) => {
-    try {
-
-        let product
-        let products = []
-        let Categorys
-        let Data = []
-
-        const { categorys, search, filterprice } = req.body
-
-
-        if (!search) {
-            if (filterprice != 0) {
-                if (filterprice.length == 2) {
-                    product = await productSchema.find({
-                        is_show: true,
-                        $and: [
-                            { price: { $lte: Number(filterprice[1]) } },
-                            { price: { $gte: Number(filterprice[0]) } }
-                        ]
-
-                    }).populate('category')
-                } else {
-                    product = await productSchema.find({
-                        is_show: true,
-                        $and: [
-                            { price: { $gte: Number(filterprice[0]) } }
-                        ]
-
-                    }).populate('category')
-                }
-            } else {
-                product = await productSchema.find({ is_show: true }).populate('category')
-            }
-
-        } else {
-
-            if (filterprice != 0) {
-                if (filterprice.length == 2) {
-                    product = await productSchema.find({
-                        is_show: true,
-                        $and: [
-                            { price: { $lte: Number(filterprice[1]) } },
-                            { price: { $gte: Number(filterprice[0]) } },
-                            {
-                                $or: [
-                                    { brand: { $regex: '.*' + search + '.*', $options: 'i' } },
-                                    { title: { $regex: '.*' + search + '.*', $options: 'i' } }
-                                ]
-                            }
-                        ]
-
-                    }).populate('category')
-                } else {
-                    product = await productSchema.find({
-                        is_show: true,
-                        $and: [
-                            { price: { $gte: Number(filterprice[0]) } },
-                            {
-                                $or: [
-                                    { brand: { $regex: '.*' + search + '.*', $options: 'i' } },
-                                    { title: { $regex: '.*' + search + '.*', $options: 'i' } }
-                                ]
-                            }
-                        ]
-
-                    }).populate('category')
-                }
-            } else {
-                product = await productSchema.find({
-                    is_show: true,
-                    $or: [
-                        { brand: { $regex: '.*' + search + '.*', $options: 'i' } },
-                        { title: { $regex: '.*' + search + '.*', $options: 'i' } }
-                    ]
-                }).populate('category')
-            }
-
-
-        }
-
-        Categorys = categorys.filter((value) => {
-            return value !== null
-        })
-        if (Categorys[0]) {
-
-            Categorys.forEach((element, i) => {
-                products[i] = product.filter((value) => {
-                    return value.category.category == element
-                })
-            });
-            products.forEach((value, i) => {
-                Data[i] = value.filter((v) => {
-                    return v
-                })
-            })
-        } else {
-            Data[0] = product
-        }
-        res.json({ Data })
-    } catch (error) {
-        console.log(error.message);
-        next(error.message)
-    }
-}
-
 
 
 
@@ -643,8 +460,6 @@ module.exports = {
     otpVerify,
     productDetails,
     loadShopPage,
-    productFilter,
-    otpSignup,
     otpSignSubmit,
     otpVerifySignup,
     emailVerified,

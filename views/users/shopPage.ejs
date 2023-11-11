@@ -136,19 +136,19 @@
                             <div class="">
                                 <label for="">
                                     5000-above
-                                    <input onclick="price(4)" type="checkbox" value="5000" id="FOUR">
+                                    <input  type="checkbox" value="5000" id="FOUR">
                                 </label><br>
                                 <label for="">
                                     2000-4999
-                                    <input onclick="price(3)" type="checkbox" value="2000,4999" id="THREE">
+                                    <input  type="checkbox" value="2000,4999" id="THREE">
                                 </label><br>
                                 <label for="">
                                     1000-1999
-                                    <input onclick="price(2)" type="checkbox" value="1000,1999" id="TWO">
+                                    <input type="checkbox" value="1000,1999" id="TWO">
                                 </label><br>
                                 <label for="">
                                     0-999
-                                    <input onclick="price(1)" type="checkbox" value="0,999" id="ONE">
+                                    <input  type="checkbox" value="0,999" id="ONE">
                                 </label><br>
                             </div>
                         </div>
@@ -230,161 +230,6 @@
         <%}%>
 
 
-
-    <script>
-        let n = 0
-        let b = 0
-        let categorys = []
-        let search
-        let prices=[]
-        let filterprice=[]
-function category(ID) {
-
-
-if ($(`#${ID}`).is(':checked') == true) {
-    categorys[n] = $(`#${ID}`).val()
-    n++
-} else {
-    let index = categorys.indexOf(`${$(`#${ID}`).val()}`)
-    categorys.splice(index, 1)
-    n--
-}
-submit(categorys,filterprice,search)
-
-}
-
-
-function submit(categorys) {
-                                    $.ajax({
-                                        url: '/shopFilter',
-                                        type: 'post',
-                                        dataType: 'json',
-                                        contentType: 'application/json',
-                                        data: JSON.stringify({ categorys,filterprice,search}),
-                                        success: (res) => {
-                                            let html = []
-                                            if (res.Data) {
-                                                $('#Filter').html('')
-                                                res.Data.forEach(value => {
-                                                    value.forEach((item, i) => {
-                                                        html += `<div class="col-lg-4 col-md-6">
-                            <div class="product__item">
-                                <div class="product__item__pic set-bg" data-setbg="">
-                                    <a href="/singleProduct?id=${item._id}"><img
-                                            src="/proImage/${item.image[0].toString('utf8')}" alt=""></a>
-                                            
-                                    <ul class="product__hover">
-                                        <li><a href="/proImage/${item.image[0].toString('utf8')}" class="image-popup"><span class="arrow_expand"></span></a></li>
-                                        <li><a href="/addToWishlist?id=${item._id}"><span class="icon_heart_alt"></span></a></li>
-                                        <li><a href="/addToCart?id=${item._id}"><span class="icon_bag_alt"></span></a></li>
-                                    </ul>
-                                </div>
-                                <div class="product__item__text">
-                                    <h6><a href="#">${item.title}</a></h6>
-                                    <div class="rating">
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                        <i class="fa fa-star"></i>
-                                    </div>
-                                    <div class="product__price">₹ ${item.price}</div>
-                                </div>
-                            </div>
-                        </div> `
-
-                                                    })
-
-                                                });
-
-                                                $('#Filter').html(html)
-
-
-
-
-                                            }
-                                        }
-                                    })
-                                }
-
-                                function filtersearch() {
-                                    search = $('#search').val()
-                                    submit(categorys, search,filterprice)
-                                }
-
-
-                                function price(check){
-                                    filterprice=[]
-                                    let one,two,three,fore
-                                    let n=0,index
-                                    if($("#ONE").is(':checked')==true){
-                                     one=$("#ONE").val()
-                                     prices[n]=one
-                                     n++
-                                    }else if(check==1){
-                                        index=prices.indexOf($("#ONE").val())
-                                        prices.splice(index,1)
-                                        
-                                    }
-                                    if($("#TWO").is(':checked')==true){
-                                        two=$("#TWO").val()
-                                        prices[n]=two
-                                        n++
-                                    }else if(check==2){
-                                        index=prices.indexOf($("#TWO").val())
-                                        prices.splice(index,1)
-                                        
-                                    }
-                                    if($("#THREE").is(':checked')==true){
-                                        three=$("#THREE").val()
-                                        prices[n]=three
-                                        n++
-                                    }else if(check==3){
-                                        index=prices.indexOf($("#THREE").val())
-                                        prices.splice(index,1)
-                                    
-                                    }
-                                    if($("#FOUR").is(':checked')==true){
-                                        fore=$("#FOUR").val()
-                                        prices[n]=fore
-                                        n++
-                                    }else if(check==4){
-                                        index=prices.indexOf($("#FOUR").val())
-                                        prices.splice(index,1)
-                                        
-                                    }
-                                    let length
-                                    if (prices) {
-                                         length=prices.length
-                                    }
-                                   
-                                    if(prices.length==1&&prices[length-1].split(',').length==2){
-                                        let first=[prices[length-1]]
-                                        first=first[0].split(',')
-        
-                                        filterprice[0]=first[0]
-                                        filterprice[1]=first[1]
-                                        
-                                    }else if(prices.length==1&&prices[length-1].split(',').length==1){
-                                        let first=[]
-                                         first[0]=prices[0]
-                                       filterprice[0]=first[0]
-                                    }else if(prices.length>1&&prices[length-1].split(',').length==2) {
-                                        let first=[prices[0]]
-                                        let second=[prices[length-1]]
-                                    first=first[0].split(',')
-                                    second=second[0].split(',')
-                                    filterprice[0]=first[0]
-                                    filterprice[1]=second[1]
-                                    }else if(prices.length>1&&prices[length-1].split(',').length==1){
-                                        let first=[prices[0]]
-                                    first=first[0].split(',')
-                                    filterprice[0]=first[0]
-                                    }
-                                    submit(categorys,search,filterprice)
-                                }
-
-    </script>
 
 
 <%- include('../layouts/pagesFooter.ejs') %>

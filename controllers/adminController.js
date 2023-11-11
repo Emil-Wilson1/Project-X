@@ -2,7 +2,6 @@ const userSchema = require('../models/userModel')
 const categorySchema = require('../models/categoryModel')
 const productSchema = require('../models/productModel')
 const nodemailer = require('nodemailer')
-const moment = require('moment');
 const bcrypt = require('bcrypt')
 const sharp = require('sharp')
 const path = require('path');
@@ -11,7 +10,7 @@ require('dotenv').config();
 let msg
 let message
 
-////////LOGIN PAGE LODING////////////
+// LOGIN PAGE LODING
 
 const loginLoad = async (req, res) => {
     res.render('login', { msg })
@@ -19,7 +18,7 @@ const loginLoad = async (req, res) => {
 }
 
 
-/////////////ADMIN LOGIN////////////////////
+// ADMIN LOGIN
 
 const adminLogin = async (req, res) => {
     try {
@@ -60,8 +59,8 @@ const loadAdminHome = async (req, res) => {
     try {
         const users = await userSchema.find()
         const usersLength = users.length
-        
-        res.render('home', {  message, usersLength });
+
+        res.render('home', { message, usersLength });
         message = null;
     } catch (error) {
         console.log(error);
@@ -69,8 +68,7 @@ const loadAdminHome = async (req, res) => {
 
 }
 
-
-/////////////LOGOUT/////////////////
+// LOGOUT
 
 const adminLogOut = async (req, res) => {
     try {
@@ -92,7 +90,7 @@ const loadUserData = async (req, res) => {
             page = req.query.page
         }
 
-        const limit = 6
+        const limit = 6      
 
         const userData = await userSchema.find(
             {
@@ -129,7 +127,7 @@ const loadUserData = async (req, res) => {
 }
 
 
-/////////////BLOCK USER///////////////
+// BLOCK USER
 
 const blockUser = async (req, res) => {
     try {
@@ -150,7 +148,7 @@ const blockUser = async (req, res) => {
             from: 'emilwilson67@gmail.com',
             to: userData.email,
             subject: 'Your Account has been Blocked',
-            html: `<p>Hii ${userData.username}, Your account has been blocked.By the Order of Peaky Blinders!</p>`,
+            html: `<p>Hii ${userData.username}, Your account has been blocked !</p>`,
         };
 
         transporter.sendMail(mailOption, (error, info) => {
@@ -168,7 +166,7 @@ const blockUser = async (req, res) => {
 }
 
 
-//////////UNBLOCK USER////////////
+// UNBLOCK USER
 
 const unblockUser = async (req, res) => {
     try {
@@ -206,7 +204,7 @@ const unblockUser = async (req, res) => {
     }
 }
 
-///////////////SHOW PRODUCTS///////////////////
+// SHOW PRODUCTS
 
 const loadProducts = async (req, res) => {
     try {
@@ -242,7 +240,7 @@ const loadProducts = async (req, res) => {
     }
 }
 
-///////////DELETE PRODUCT//////////////////
+// DELETE PRODUCT
 
 const deleteProduct = async (req, res) => {
     try {
@@ -261,7 +259,7 @@ const deleteProduct = async (req, res) => {
         console.log(error);
     }
 }
-///////////////////LOAD EDIT PRODUCT PAGE//////////////////
+// LOAD EDIT PRODUCT PAGE
 
 const loadEditPage = async (req, res) => {
     try {
@@ -275,7 +273,7 @@ const loadEditPage = async (req, res) => {
     }
 }
 
-///////////////ADD PRODUCT//////////////////
+// LOAD ADD PRODUCT
 
 const newProduct = async (req, res) => {
     try {
@@ -288,7 +286,7 @@ const newProduct = async (req, res) => {
     }
 }
 
-///////////ADD PRODUCT///////////
+// ADD PRODUCT
 
 const addProduct = async (req, res) => {
     try {
@@ -346,7 +344,7 @@ const addProduct = async (req, res) => {
         console.log(error);
     }
 }
-////////EDIT PRODUCTS/////////////
+// EDIT PRODUCTS
 
 const editProduct = async (req, res) => {
     try {
@@ -418,7 +416,7 @@ const editProduct = async (req, res) => {
     }
 }
 
-//////////LOAD ADD CATEGORY////////////
+//LOAD ADD CATEGORY
 
 const loadAddCategory = async (req, res) => {
     try {
@@ -429,7 +427,7 @@ const loadAddCategory = async (req, res) => {
     }
 }
 
-////////////ADD CATEGORY///////////////
+// ADD CATEGORY
 
 const addCategory = async (req, res) => {
     const newCat = req.body.newcategory
@@ -451,8 +449,7 @@ const addCategory = async (req, res) => {
         }
     }
 }
-
-////////LOAD EDIT CATEGORY PAGE///////////
+// LOAD EDIT CATEGORY PAGE
 
 const loadEditCategory = async (req, res) => {
     try {
@@ -465,8 +462,7 @@ const loadEditCategory = async (req, res) => {
     }
 }
 
-
-////////////EDIT CATEGORY///////////
+// EDIT CATEGORY
 
 const editCategory = async (req, res) => {
     try {
@@ -487,7 +483,7 @@ const editCategory = async (req, res) => {
     }
 }
 
-////////////CATEGORY MANAGE///////////////////
+// CATEGORY MANAGE
 
 const categoryManage = async (req, res) => {
     try {
@@ -499,8 +495,7 @@ const categoryManage = async (req, res) => {
         console.log(error);
     }
 }
-
-////////////////////DELETE CATEGORY////////////
+// DELETE CATEGORY
 
 const categoryDelete = async (req, res) => {
     try {
@@ -541,5 +536,5 @@ module.exports = {
     categoryDelete,
     loadEditCategory,
     loadAddCategory,
-   
+
 }

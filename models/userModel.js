@@ -19,9 +19,6 @@ const userSchema = mongoose.Schema({
     image: {
         type: Buffer,
     },
-    address: {
-        type: Array
-    },
     is_admin: {
         type: Number,
         required: true
@@ -32,11 +29,6 @@ const userSchema = mongoose.Schema({
     }, is_blocked: {
         type: Number,
         default: 0
-    }, wishlist: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Products'
-    }], wallet: {
-        type: Number,
     }
 })
 
