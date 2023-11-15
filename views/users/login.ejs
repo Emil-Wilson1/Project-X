@@ -14,14 +14,14 @@
               <input name="password" type="password" id="pas" class="form-control input-sm chat-input text-center"
                 placeholder="Password" />
               <% if(typeof message!='undefined' ||typeof msg!='undefined' ){ %>
-                <small class="text-success txt-style">
+                <h6 class="text-success txt-style">
                   <%= message %>
-                </small>
-                <small class="text-danger txt-style">
+                </h6>
+                <h6 class="text-danger txt-style ">
                   <%= msg %>
-                </small>
+                </h6>
                 <% } %>
-                <small class="error text-danger txt-style"></small>
+                <h6 class="error text-danger txt-style"></h6>
                   </br></br>
                   <div class="wrapper">
                     <span class="group-btn">
@@ -33,6 +33,12 @@
           <div class="wrapper">
             <span class="group-btn">
               <br><a href="/otp-login" class="btn btn-outline-success btn-lg txt-style">OTP login</a>
+            </span>
+          </div>
+          <br>
+          <div class="wrapper">
+            <span class="group-btn">
+              <br><br><a href="/forgot" class="acc txt-style text-white fs-5 ">Forgot Password? </a>
             </span>
           </div>
           <br>

@@ -3,6 +3,9 @@ const productSchema = require('../models/productModel')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
 const categoryModel = require('../models/categoryModel')
+const cartSchema=require('../models/cartModel')
+const randomString = require('randomstring')
+const { reset } = require('nodemon')
 require('dotenv').config();
 
 
@@ -39,6 +42,30 @@ const otpSignSubmit = async (req, res, next) => {
 
 
 
+// const otpVerifySignup = async (req, res, next) => {
+//     try {
+//         if (req.body.otp.trim().length == 0) {
+//             res.redirect('/otp-page-signup')
+//             msg = 'Please Enter OTP'
+//         } else {
+//             const OTP = req.body.otp
+//             if (regex_otp.test(OTP) == false) {
+//                 res.redirect('/otp-page-signup')
+//                 msg = 'Only numbers allowed'
+//             } else if (otp == OTP) {
+//                 await User.updateOne({ email: otpCheckMail }, { $set: { is_verified: 1 } })
+//                 res.render('email_verified')
+//             } else {
+//                 res.redirect('/otp-page-signup')
+//                 msg = 'OTP is incorrect'
+//             }
+//         }
+//     } catch (error) {
+//         console.log(error.message);
+//         next(error.message)
+//     }
+// }
+
 const otpVerifySignup = async (req, res, next) => {
     try {
         if (req.body.otp.trim().length == 0) {
@@ -51,6 +78,11 @@ const otpVerifySignup = async (req, res, next) => {
                 msg = 'Only numbers allowed'
             } else if (otp == OTP) {
                 await User.updateOne({ email: otpCheckMail }, { $set: { is_verified: 1 } })
+
+                // OTP is correct, clear the previous OTP and reset the timer
+                otp = ''; // Assuming `otp` is a global variable storing the OTP
+                timerOn = false; // Stop the timer
+
                 res.render('email_verified')
             } else {
                 res.redirect('/otp-page-signup')
@@ -63,7 +95,8 @@ const otpVerifySignup = async (req, res, next) => {
     }
 }
 
-const emailVerified = async (req,res,next)=>{
+
+const emailVerified = async (req, res, next) => {
     try {
         res.render('email_verified', { message, msg })
         message = null
@@ -94,7 +127,7 @@ const insertUser = async (req, res, next) => {
     let user
     const checkMail = await User.findOne({ email: usd.email })
     const checkMob = await User.findOne({ phone: usd.phone })
-    otpCheckMail=req.body.email;
+    otpCheckMail = req.body.email;
 
     try {
         if (!usd.email && !usd.phone && !usd.password && !usd.username) {
@@ -142,36 +175,36 @@ const insertUser = async (req, res, next) => {
         const userData = await user.save()
 
         if (userData) {
-           
+
             res.redirect('/otp-page-signup');
             message = 'Please Check Your Mail !'
-                const mailtransport = nodemailer.createTransport({
-                    host: 'smtp.gmail.com',
-                    port: 465,
-                    secure: true,
-                    auth: {
-                        user: 'emilwilson67@gmail.com',
-                        pass: process.env.EMAILPASS,
-                    },
-                });
+            const mailtransport = nodemailer.createTransport({
+                host: 'smtp.gmail.com',
+                port: 465,
+                secure: true,
+                auth: {
+                    user: 'emilwilson67@gmail.com',
+                    pass: process.env.EMAILPASS,
+                },
+            });
 
-                otp = otpgen();
-                let details = {
-                    from: "emilwilson67@gmail.com",
-                    to: otpCheckMail,
-                    subject: "FINITO Fashion Club",
-                    text: otp + " is your Finito Fashion Club verification code. Do not share OTP with anyone "
-                };
+            otp = otpgen();
+            let details = {
+                from: "emilwilson67@gmail.com",
+                to: otpCheckMail,
+                subject: "FINITO Fashion Club",
+                text: otp + " is your Finito Fashion Club verification code. Do not share OTP with anyone "
+            };
 
-                mailtransport.sendMail(details, (err) => {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        console.log("success");
-                    }
-                });
-           
-           
+            mailtransport.sendMail(details, (err) => {
+                if (err) {
+                    console.log(err);
+                } else {
+                    console.log("success");
+                }
+            });
+
+
         } else {
             res.redirect('/signup')
             msg = 'Registration failed'
@@ -242,38 +275,59 @@ const verifyLogin = async (req, res, next) => {
     }
 }
 
-///////LOADING HOME PAGE////////
+// ///////LOADING HOME PAGE////////
 
-const loadHome = async (req, res, next) => {
-    try {
-        let session = req.session.user_id
-        const products = await productSchema.find({ is_show: true }).sort({ _id: -1 }).limit(4)
-       
-        res.render('home', { product: products, session, msg, message})
-        msg = null,
-            message = null
-    } catch (err) {
-        console.log(err);
-        next(err.message)
-    }
-}
+// const loadHome = async (req, res, next) => {
+//     try {
+//         let session = req.session.user_id
+//         const products = await productSchema.find({ is_show: true }).sort({ _id: -1 }).limit(4)
 
-//////////////////LOAD PRODUCT DETAILS PAGE//////////////
+//         res.render('home', { product: products, session, msg, message })
+//         msg = null,
+//             message = null
+//     } catch (err) {
+//         console.log(err);
+//         next(err.message)
+//     }
+// }
 
-const productDetails = async (req, res, next) => {
-    try {
-        const id = req.query.id
-        const session = req.session.user_id
-        const product = await productSchema.findOne({ _id: new Object(id) })
-        res.render('singleProduct', { product: product, session, message, msg })
-        msg = null,
-            message = null
-    } catch (error) {
-        console.log(error);
-        next(error.message)
-    }
-}
+// //////////////////LOAD PRODUCT DETAILS PAGE//////////////
 
+// const productDetails = async (req, res, next) => {
+//     try {
+//         const id = req.query.id
+//         const session = req.session.user_id
+//         const product = await productSchema.findOne({ _id: new Object(id) })
+//         res.render('singleProduct', { product: product, session, message, msg })
+//         msg = null,
+//             message = null
+//     } catch (error) {
+//         console.log(error);
+//         next(error.message)
+//     }
+// }
+
+
+// ////////////LOAD SHOP PAGE/////////////
+
+// const loadShopPage = async (req, res, next) => {
+//     try {
+//         let page = 1
+//         if (req.query.page) {
+//             page = req.query.page
+//         }
+//         const session = req.session.user_id
+//         const count = await productSchema.find({ is_show: true }).countDocuments()
+//         const product = await productSchema.find({ is_show: true }).limit(6).skip((page - 1) * 6).exec()
+//         const category = await categoryModel.find()
+//         res.render('shopPage', { session, product, category, message, msg, totalPages: Math.ceil(count / 6) })
+//         msg = null,
+//             message = null
+//     } catch (error) {
+//         console.log(error.message);
+//         next(error.message)
+//     }
+// }
 
 
 
@@ -287,10 +341,6 @@ const logOut = async (req, res) => {
 
 ///////////ADMIN BLOCKED/////////////
 
-const logOutIn = async (req, res) => {
-    req.session.user_id = null
-    res.redirect('/admin/userData')
-}
 
 
 
@@ -418,29 +468,389 @@ const otpVerify = async (req, res, next) => {
     }
 }
 
+//  FORGOT PASSWORD
 
-
-
-////////////LOAD SHOP PAGE/////////////
-
-const loadShopPage = async (req, res, next) => {
+const forgot = (req, res) => {
     try {
-        let page = 1
-        if (req.query.page) {
-            page = req.query.page
-        }
-        const session = req.session.user_id
-        const count = await productSchema.find({ is_show: true }).countDocuments()
-        const product = await productSchema.find({ is_show: true }).limit(6).skip((page - 1) * 6).exec()
-        const category = await categoryModel.find()
-        res.render('shopPage', { session, product, category, message, msg, totalPages: Math.ceil(count / 6) })
-        msg = null,
-            message = null
+        res.render('forgot', { message, msg })
+        message = null
+        msg = null
     } catch (error) {
-        console.log(error.message);
-        next(error.message)
+        console.error(error)
     }
 }
+
+const resetPassword = async (req, res) => {
+    try {
+        const user = req.body.email
+        console.log("Entered")
+        const userData = await User.findOne({ email: user })
+        if (userData) {
+            console.log("true")
+            if (user.is_verified) {
+            console.log("true2");
+                res.redirect('/forgot')
+                msg = "Email is Not Verified"
+            } else {
+                console.log("sending email");
+                const randomstring=randomString.generate()
+                const updatedData= await User.updateOne({email:user},{$set:{token:randomstring}})
+                sendResetPasswordMail(userData.username,userData.email,randomstring)
+                console.log("Please Check");
+                res.redirect('/forgot')
+                msg="Please Check Your Mail!"
+             }
+             
+        }else{
+            console.log("Wrang");
+            res.redirect('/forgot')
+            msg="Entered Mail is Incorrect"
+        }
+    
+
+    } catch (error) {
+        console.error(error.message);
+    }
+
+}
+
+const sendResetPasswordMail = async (name, email, token) => {
+    try {
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            post: 587,
+            secure: false,
+            requireTLS: true,
+            auth: {
+                user: "emilwilson67@gmail.com",
+                pass: process.env.EMAILPASS
+            }
+        })
+
+        const mailOption = {
+            from: "emilwilson67@gmail.com",
+            to: email,
+            subject: 'For Change Password',
+            html:  `<p>Hii ${name}, please click <a href="http://localhost:3001/resetpass?token=${token}">here</a> to verify your email.</p>`,
+        }
+
+        transporter.sendMail(mailOption, (error, info) => {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log("Email Has Been Sent :", info.response);
+            }
+        })
+    } catch (error) {
+        console.log(error.message)
+    }
+}
+
+const newPassword = async(req,res) => {
+    try {
+        console.log("Entered")
+        const token = req.query.token
+        const userData = await User.findOne({token : token})
+        if(userData){
+            console.log("coming");
+            res.render('newPassword',{username : userData.username})
+        }else{
+            res.render('error',{message : 'Invlaid Token'})
+        }
+    } catch (error) {
+        console.log(error.message)
+    }
+}
+
+
+const addNewPassword = async (req,res) => {
+    try {
+        const password = req.body.password
+        const Rpassword=req.body.Rpassword
+        console.log(password)
+        console.log(Rpassword)
+        const user = req.body.username
+        console.log(user)
+        if(password==Rpassword){
+        const secure = await securePassword(password)
+        console.log(secure)
+        const userData =  await User.updateOne({username: user},{$set : {password : secure, token : ''}})
+        console.log(userData)
+
+        res.redirect('/login')
+        }else{
+            res.redirect('/restpass')
+            msg="Entered password is not matching!!"
+        }
+    } catch (error) {
+        console.log(error.message)
+        // res.render('user/505');
+    }
+}
+
+
+
+// ////////////LOAD SHOP PAGE/////////////
+
+// const loadShopPage = async (req, res, next) => {
+//     try {
+//         let page = 1
+//         if (req.query.page) {
+//             page = req.query.page
+//         }
+//         const session = req.session.user_id
+//         const count = await productSchema.find({ is_show: true }).countDocuments()
+//         const product = await productSchema.find({ is_show: true }).limit(6).skip((page - 1) * 6).exec()
+//         const category = await categoryModel.find()
+//         res.render('shopPage', { session, product, category, message, msg, totalPages: Math.ceil(count / 6) })
+//         msg = null,
+//             message = null
+//     } catch (error) {
+//         console.log(error.message);
+//         next(error.message)
+//     }
+// }
+
+
+// // LOAD CART
+// const loadCart = async (req, res, next) => {
+//     try {
+//         const session = req.session.user_id
+//         const cartProducts = await cartSchema.findOne({ userId: session }).populate('item.product')
+//         let totalPrice = 0
+//         if (cartProducts && cartProducts.item != null) {
+//             cartProducts.item.forEach(value => totalPrice += value.price * value.quantity);
+//         }
+//         await cartSchema.updateOne({ userId: session }, { $set: { totalPrice: totalPrice } })
+//         res.render('cart', { session, cartProducts, totalPrice,msg })
+//         msg = null
+//     } catch (error) {
+//         console.log(error);
+//         next(error.message)
+//     }
+// }
+
+// // ADD TO CART
+// const addToCart = async (req, res, next) => {
+//     try {
+//         const product_Id = req.query.id
+//         const user_Id = req.session.user_id
+
+//         const product = await productSchema.findOne({ _id: new Object(product_Id) })
+//         const userCart = await cartSchema.findOne({ userId: user_Id });
+//         const cartCount = await cartSchema.findOne({ userId: user_Id, "item.product": product_Id })
+//         const wishList = await User.findOne({ _id: user_Id })
+
+//         if (userCart) {
+//             const itemIndex = userCart.item.findIndex(item => item.product._id.toString() === product_Id);
+//             if (itemIndex >= 0) {
+//                 if (cartCount) {
+//                     const item = cartCount.item.find(item => item.product.toString() === product_Id)
+//                     if (item) {
+//                         if (item.quantity >= product.stocks) {
+//                             const referer = req.headers.referer || "/";
+//                             res.redirect(referer);
+//                             msg = 'Item out of stock'
+//                         } else {
+//                             await cartSchema.updateOne({ userId: user_Id, "item.product": product_Id }, { $inc: { "item.$.quantity": 1 } });
+//                         }
+//                     }
+//                 }
+//             } else {
+//                 if (product.stocks < 1) {
+//                     const referer = req.headers.referer || "/";
+//                     res.redirect(referer);
+//                     msg = 'Item out of stock'
+//                 } else {
+
+//                     await cartSchema.updateOne(
+//                         { userId: user_Id },
+//                         { $push: { item: { product: product_Id, price: product.price, quantity: 1 } } }
+//                     );
+//                     if (wishList.wishlist.includes(product_Id)) {
+//                         wishList.wishlist.pull(product_Id);
+//                         await wishList.save();
+//                     }
+//                 }
+//             }
+//         } else {
+//             if (product.stocks < 1) {
+//                 const referer = req.headers.referer || "/";
+//                 res.redirect(referer);
+//                 msg = 'Item out of stock'
+//             } else {
+//                 await cartSchema.insertMany({ userId: user_Id, item: [{ product: product_Id, price: product.price, quantity: 1 }] });
+//                 if (wishList.wishlist.includes(product_Id)) {
+//                     await User.updateOne({ _id: user_Id }, { $unset: { wishlist: product_Id } })
+//                 }
+//             }
+//         }
+
+//         const referer = req.headers.referer || "/";
+//         res.redirect(referer);
+//         message = 'Item successfully added'
+
+//     } catch (error) {
+//         console.log(error);
+//         next(error.message)
+//     }
+// }
+
+
+
+// const incrementCart = async (req, res, next) => {
+//     try {
+//         const userId = req.session.user_id;
+//         const itemid = req.query.id;
+//         const cartCount = await cartSchema.findOne({ 'item._id': itemid })
+//         const item = cartCount.item.find(item => item._id.toString() === itemid)
+//         const product = await productSchema.findOne({ _id: item.product })
+//         if (item) {
+//             if (item.quantity >= product.stocks) {
+//                 msg = 'Item out of stock'
+//                 res.redirect('/cart');
+//             } else {
+//                 await cartSchema.updateOne({ userId: userId, "item._id": itemid }, { $inc: { "item.$.quantity": 1 } });
+//                 let total = 0
+//                 const cart = await cartSchema.findOne({ userId: userId, "item._id": itemid })
+
+//                 cart.item.forEach(value => {
+//                     total += value.price * value.quantity
+//                 })
+//                 await cartSchema.updateOne({ userId: userId }, { $set: { totalPrice: total } })
+
+//                 const carts = await cartSchema.findOne({ userId: userId, "item._id": itemid })
+
+//                 const q = carts.item.filter((value) => {
+//                     return value._id == itemid
+//                 })
+//                 const quantity = q[0].quantity
+//                 const price = quantity * q[0].price
+//                 const totalPrice = carts.totalPrice
+//                 res.json({ quantity: quantity, price: price, totalPrice: totalPrice })
+//             }
+//         }
+
+//     } catch (error) {
+//         console.log(error);
+//         next(error.message)
+//     }
+// };
+
+// //////DECREMETN CART////////
+
+// const decrementCart = async (req, res, next) => {
+//     try {
+//         const userId = req.session.user_id;
+//         const itemid = req.query.id;
+//         const cart = await cartSchema.findOne({ userId: userId, "item._id": itemid });
+//         const currentItem = cart.item.find(item => item._id.toString() === itemid);
+//         if (currentItem.quantity <= 1) {
+//             res.redirect('/cart');
+//             return;
+//         } else {
+//             await cartSchema.updateOne({ userId: userId, "item._id": itemid, }, { $inc: { "item.$.quantity": -1 } });
+//             let total = 0
+//             const cart = await cartSchema.findOne({ userId: userId, "item._id": itemid })
+
+//             cart.item.forEach(value => {
+//                 total += value.price * value.quantity
+//             })
+//             await cartSchema.updateOne({ userId: userId }, { $set: { totalPrice: total } })
+
+//             const carts = await cartSchema.findOne({ userId: userId, "item._id": itemid })
+
+//             const q = carts.item.filter((value) => {
+//                 return value._id == itemid
+//             })
+//             const quantity = q[0].quantity
+//             const price = quantity * q[0].price
+//             const totalPrice = carts.totalPrice
+//             res.json({ quantity: quantity, price: price, totalPrice: totalPrice })
+//         }
+//     } catch (error) {
+//         console.log(error);
+//         next(error.message)
+//     }
+// }
+
+// //////REMOVE FROM CART////////
+
+// const removeCart = async (req, res, next) => {
+//     try {
+//         const id = req.query.id
+//         const userId = req.session.user_id
+//         await cartSchema.updateOne({ userId: new Object(userId) }, { $pull: { item: { _id: new Object(id) } } })
+//         res.redirect('/cart')
+//     } catch (error) {
+//         console.log(error);
+//         next(error.message)
+//     }
+
+// }
+
+
+// ///////////LOAD WISHLIST//////////////
+
+// const loadWishList = async (req, res, next) => {
+//     try {
+//         const session = req.session.user_id
+//         const wishlist = await User.findOne({ _id: session }).populate('wishlist')
+//         res.render('wishList', { session, wishlist, message })
+//         message = null
+//     } catch (error) {
+//         console.log(error.message);
+//         next(error.message)
+//     }
+// }
+
+// //////////ADD TO WISHLIST////////////
+
+// const addToWishlist = async (req, res, next) => {
+//     try {
+//         const session = req.session.user_id
+//         const productId = req.query.id
+//         const user = await User.findOne({ _id: session })
+//         const cart = await cartSchema.findOne({ userId: session, "item.product": productId })
+//         if (cart) {
+//             msg = 'product already in cart'
+//             const referer = req.headers.referer || "/";
+//             res.redirect(referer);
+//         } else {
+//             if (!user.wishlist.includes(productId)) {
+//                 user.wishlist.push(productId)
+//                 await user.save()
+//                 const referer = req.headers.referer || "/";
+//                 res.redirect(referer);
+//                 message = 'Item added to wishlist'
+//             } else {
+//                 const referer = req.headers.referer || "/";
+//                 res.redirect(referer);
+//                 msg = 'Item already in wishist'
+//             }
+//         }
+
+//     } catch (error) {
+//         console.log(error.message);
+//         next(error.message)
+//     }
+// }
+
+// /////////////REMOVE FROM WISHLIST//////
+
+// const removeWishlist = async (req, res, next) => {
+//     try {
+//         const session = req.session.user_id
+//         const product = req.query.id
+//         const del = await User.findOne({ _id: session })
+//         del.wishlist.pull(product);
+//         await del.save();
+//         res.redirect('/wishlist')
+//     } catch (error) {
+//         console.log(error.message);
+//         next(error.message)
+//     }
+// }
 
 
 
@@ -451,15 +861,15 @@ module.exports = {
     insertUser,
     loginUser,
     verifyLogin,
-    loadHome,
     logOut,
-    logOutIn,
     otpLogin,
     verifyotpMail,
     otppage,
     otpVerify,
-    productDetails,
-    loadShopPage,
+    forgot,
+    resetPassword,
+    newPassword,
+    addNewPassword,
     otpSignSubmit,
     otpVerifySignup,
     emailVerified,

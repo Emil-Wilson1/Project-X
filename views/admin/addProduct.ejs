@@ -165,6 +165,10 @@
                         <input type="file" name="image" class="form-control" id="customFile2"
                           onchange="return fileValidation()" multiple />
                       </div>
+                      
+                        
+                      </div>
+                      <div id="imagePreviewContainer" class="d-flex justify-content-center"></div>
                     </div>
                   </div>
                 </div>
@@ -250,36 +254,81 @@
             }
           });
 
+          // function fileValidation() {
+          //   const fileInput =
+          //     document.getElementById('customFile2');
+
+          //   const filePath = fileInput.value;
+
+          //   const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.webp)$/i;
+          //   if (!allowedExtensions.exec(filePath)) {
+          //     alert('Invalid file type');
+          //     fileInput.value = '';
+          //     return false;
+          //   }else if(fileInput.files.length !=4){
+          //     alert('Please add 4 images');
+          //     fileInput.value = '';
+          //     return false;
+          //   }
+          //   else {
+          //     if (fileInput.files && fileInput.files[0]) {
+          //       const reader = new FileReader();
+          //       reader.onload = function (e) {
+          //         document.getElementById(
+          //           'customFile2').innerHTML =
+          //           '<img src="' + e.target.result
+          //           + '"/>';
+          //       };
+
+          //       reader.readAsDataURL(fileInput.files[0]);
+          //     }
+          //   }
+          // }
+
           function fileValidation() {
-            const fileInput =
-              document.getElementById('customFile2');
+    const fileInput = document.getElementById('customFile2');
+    const previewContainer = document.getElementById('imagePreviewContainer');
+    
+    // Clear previous previews
+    previewContainer.innerHTML = '';
 
-            const filePath = fileInput.value;
+    const files = fileInput.files;
 
-            const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.webp)$/i;
-            if (!allowedExtensions.exec(filePath)) {
-              alert('Invalid file type');
-              fileInput.value = '';
-              return false;
-            }else if(fileInput.files.length !=4){
-              alert('Please add 4 images');
-              fileInput.value = '';
-              return false;
-            }
-            else {
-              if (fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                  document.getElementById(
-                    'customFile2').innerHTML =
-                    '<img src="' + e.target.result
-                    + '"/>';
-                };
+    const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.webp)$/i;
+    
+    if (files.length !== 4) {
+      alert('Please select exactly 4 images');
+      fileInput.value = '';
+      return false;
+    }
 
-                reader.readAsDataURL(fileInput.files[0]);
-              }
-            }
-          }
+    for (const file of files) {
+      if (!allowedExtensions.exec(file.name)) {
+        alert('Invalid file type');
+        fileInput.value = '';
+        return false;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        // Create an img element for each file
+        const imgElement = document.createElement('img');
+        imgElement.src = e.target.result;
+        imgElement.style.width = '100px'; // Adjust the width as needed
+        imgElement.style.height = '100px'; // Adjust the height as needed
+        imgElement.style.marginTop='10px'
+        imgElement.style.marginRight = '10px';
+
+        // Append the img element to the preview container
+        previewContainer.appendChild(imgElement);
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    return true;
+  }
         </script>
 
         <%- include('../layouts/footer.ejs') %>

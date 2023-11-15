@@ -163,11 +163,20 @@
 
                 <div class="d-flex justify-content-center">
                   <div class="btn btn-dark btn-rounded">
-                    <img src="/proImage/<%=product.image[0]%>" alt="">
+                    
                     <input type="file" name="image" class="form-control mt-2" onchange="return fileValidation()"
                       multiple id="customFile2" />
                   </div>
                 </div>
+                </div>
+
+                 <div id="imagePreview" class="mt-2">
+                  <% for (let i = 0; i < product.image.length; i++) { %>
+                    <div class="image-container">
+                      <img src="/proImage/<%= product.image[i] %>" alt="" width="100"; height="100" class="mt-3">
+                      <button type="button" class="delete-image-btn" onclick="deleteImage(this)">Delete</button>
+                    </div>
+                  <% } %>
               </div>
             </div>
             <div class="col-6 mb-4">
@@ -210,6 +219,7 @@
     const stocks = document.getElementById("stocks");
     const image = document.getElementById('customFile2')
     const errorElement = document.querySelector('.error');
+    const imagePreviewContainer = document.getElementById('imagePreview');
 
     const regex_No =  /^[0-9]*$/
 
@@ -249,37 +259,118 @@
 
 
 
+    // function fileValidation() {
+    //   const fileInput =
+    //     document.getElementById('customFile2');
+
+    //   const filePath = fileInput.value;
+
+    //   const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+
+    //   if (!allowedExtensions.exec(filePath)) {
+    //     alert('Invalid file type');
+    //     fileInput.value = '';
+    //     return false;
+    //   }else if(fileInput.files.length !=4){
+    //           alert('Please add 4 images');
+    //           fileInput.value = '';
+    //           return false;
+    //         }
+    //   else {
+    //     if (fileInput.files && fileInput.files[0]) {
+    //       const reader = new FileReader();
+    //       reader.onload = function (e) {
+    //         document.getElementById(
+    //           'imagePreview').innerHTML =
+    //           '<img src="' + e.target.result
+    //           + '"/>';
+    //       };
+
+    //       reader.readAsDataURL(fileInput.files[0]);
+    //     }
+    //   }
+    // }
+
     function fileValidation() {
-      const fileInput =
-        document.getElementById('customFile2');
+    const fileInput = document.getElementById('customFile2');
+    const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
 
-      const filePath = fileInput.value;
+    if (!allowedExtensions.exec(fileInput.value)) {
+      alert('Invalid file type');
+      fileInput.value = '';
+      return false;
+    }  else if (fileInput.files.length === 0 || fileInput.files.length > 4) {
+    alert('Please add between 1 and 4 images');
+    fileInput.value = '';
+    return false;
+    } else {
+      // Clear previous previews
+      imagePreviewContainer.innerHTML = '';
 
-      const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+      for (const file of fileInput.files) {
+        const reader = new FileReader();
 
-      if (!allowedExtensions.exec(filePath)) {
-        alert('Invalid file type');
-        fileInput.value = '';
-        return false;
-      }else if(fileInput.files.length !=4){
-              alert('Please add 4 images');
-              fileInput.value = '';
-              return false;
-            }
-      else {
-        if (fileInput.files && fileInput.files[0]) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            document.getElementById(
-              'imagePreview').innerHTML =
-              '<img src="' + e.target.result
-              + '"/>';
+        reader.onload = function (e) {
+          // Create an img element for each file
+          const imgElement = document.createElement('img');
+            imgElement.src = e.target.result;
+            imgElement.style.width = '100px'; // Adjust the width as needed
+            imgElement.style.height = '100px'; // Adjust the height as needed
+            imgElement.style.marginTop = '10px';
+
+            // Create a div container for each image with a delete button
+            const imageContainer = document.createElement('div');
+            imageContainer.className = 'image-container';
+            imageContainer.appendChild(imgElement);
+
+            const deleteButton = document.createElement('button');
+            deleteButton.type = 'button';
+            deleteButton.className = 'delete-image-btn';
+            deleteButton.innerText = 'Delete';
+
+            // Store the file reference in a data attribute
+            deleteButton.setAttribute('data-file', file.name);
+
+            deleteButton.onclick = function () {
+              deleteImage(this);
+            };
+
+            imageContainer.appendChild(deleteButton);
+
+            // Append the img element with the delete button to the preview container
+            imagePreviewContainer.appendChild(imageContainer);
           };
 
-          reader.readAsDataURL(fileInput.files[0]);
+          reader.readAsDataURL(file);
         }
       }
     }
+
+    function deleteImage(button) {
+      const imageContainer = button.parentElement;
+      const fileName = button.getAttribute('data-file');
+
+      // Send an HTTP DELETE request to the server
+      fetch('/delete-image', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ fileName: fileName }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          // Do something with the response, e.g., show a message
+          console.log(data.message);
+          // Remove the image container on success
+          imageContainer.remove();
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+
+
   </script>
 
   <%- include('../layouts/footer.ejs') %>

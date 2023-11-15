@@ -14,7 +14,7 @@
 
                 <div class="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1">
 
-                  <form class="mx-1 mx-md-4" id="form" action='/signup' method="post">
+                  <form class="mx-1 mx-md-4" id="form" action='/signup' method="POST">
 
                     <div class="d-flex flex-row align-items-center mb-4">
 
@@ -73,7 +73,7 @@
 
                     <br>
                     <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                      <button type="submit" class="btn btn-dark btn-lg txt-style">Register</button>
+                      <button type="submit" class="btn btn-dark btn-lg txt-style" >Register</button>
                     </div>
 
                   </form>
@@ -137,6 +137,8 @@
         errorElement.innerText = messages.join(', ');
       }
     });
+   
   </script>
+
 
   <%- include('../layouts/footerUser.ejs')%>

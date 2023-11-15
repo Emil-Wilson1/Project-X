@@ -29,7 +29,13 @@ const userSchema = mongoose.Schema({
     }, is_blocked: {
         type: Number,
         default: 0
-    }
+    },token:{
+        type:String,
+        default:''
+    }, wishlist: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Products'
+    }]
 })
 
 module.exports = mongoose.model('User', userSchema)

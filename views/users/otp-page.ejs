@@ -21,6 +21,7 @@
                 </small>
                 <%}%>
                   </br></br>
+                  <p id="countdownTimer" class="text-white">OTP will be expire in <span id="countdown">30</span></p>
                   <div class="wrapper">
                     <span class="group-btn">
                       <button type="submit" class="btn btn-danger btn-lg txt-style">Submit OTP</button>
@@ -33,6 +34,40 @@
     </div>
     </section>
   </body>
+  <script>
+    function startTimer(duration, display) {
+     var timer = duration, minutes, seconds;
+     setInterval(function () {
+         minutes = parseInt(timer / 60, 10)
+         seconds = parseInt(timer % 60, 10);
+ 
+         minutes = minutes < 10 ? "0" + minutes : minutes;
+         seconds = seconds < 10 ? "0" + seconds : seconds;
+ 
+         display.textContent = minutes + ":" + seconds;
+ 
+         if (--timer < 0) {
+             timer = duration;
+         }
+     }, 1000);
+ }
+ 
+ 
+     var countdown=document.getElementById('countdown');
+     var countdownTimer=document.getElementById('countdownTimer')
+     startTimer(30,countdown)
+     function  countdownExpired(){
+       countdownTimer.innerHTML='OTP has expired .<a href="/otpresend" class="text-primary">RESEND</a> '
+     }
+     setTimeout(countdownExpired,30000);
+ 
+ 
+   function hide(){
+     document.getElementById('demo').innerHTML=''
+   }
+   document.getElementById('otp').addEventListener('click',hide);
+   </script>
+
 
 
   <%- include('../layouts/footerUser.ejs') %>

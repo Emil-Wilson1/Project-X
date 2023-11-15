@@ -136,7 +136,7 @@
                                     <th scope="col-2">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <!-- <tbody>
                                 <% if(product.length>0){
                                     for(let i=0;i< product.length;i++){ %>
                                         <div>
@@ -208,7 +208,77 @@
                                                 <td colspan="5">No Products to Display</td>
                                             </tr>
                                             <% } %>
+                            </tbody> -->
+
+                            <tbody>
+                                <% if (product.length > 0) {
+                                    // Reverse the order of the products array
+                                    const reversedProducts = product.slice().reverse();
+                            
+                                    reversedProducts.forEach(function(singleProduct) { %>
+                                        <tr>
+                                            <td>
+                                                <%= singleProduct.title %>
+                                            </td>
+                                            <td>
+                                                <%= singleProduct.brand %>
+                                            </td>
+                                            <td>
+                                                <%= singleProduct.price %>
+                                            </td>
+                                            <td>
+                                                <img width="15%" src="/proImage/<%= singleProduct.image[0] %>" alt="">
+                                            </td>
+                                            <td>
+                                                <%= singleProduct.category.category %>
+                                            </td>
+                                            <td>
+                                                <a href="/admin/editProduct?id=<%= singleProduct._id %>">
+                                                    <button type="button" class="btn btn-primary btn-sm rounded-pill">Edit</button>
+                                                </a>
+                                                <br><br>
+                                                <% if (singleProduct.is_show) { %>
+                                                    <button type="button" data-bs-toggle="modal"
+                                                        data-bs-target="#deletePro<%= singleProduct._id %>"
+                                                        class="btn btn-danger btn-sm rounded-pill">Unlist</button>
+                                                <% } else { %>
+                                                    <a href="/admin/deleteProduct?id=<%= singleProduct._id %>"
+                                                        class="btn btn-success btn-sm rounded-pill">Show</a>
+                                                <% } %>
+                            
+                                                <div class="modal fade" id="deletePro<%= singleProduct._id %>" tabindex="-1"
+                                                    aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content text-dark">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="exampleModalLabel">Unlist Product</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                    aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                Are you sure you want to Unlist this product
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary"
+                                                                    data-bs-dismiss="modal">Close</button>
+                                                                <a href="/admin/deleteProduct?id=<%= singleProduct._id %>">
+                                                                    <button type="button" class="btn btn-danger">Unlist</button>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                <% });
+                                } else { %>
+                                    <tr>
+                                        <td colspan="5">No Products to Display</td>
+                                    </tr>
+                                <% } %>
                             </tbody>
+                            
+                            
 
                         </table>
                         <%for(let j=1;j<=totalPages;j++){%>

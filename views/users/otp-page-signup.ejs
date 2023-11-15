@@ -1,6 +1,6 @@
 <%- include('../layouts/headerUser.ejs') %>
 
-  <body class="img js-fullheight">
+  <!-- <body class="img js-fullheight">
     <div class="container">
       <div class="row mt-5 justify-content-center">
         <div class=" col-md-4 text-center mt-5">
@@ -33,6 +33,76 @@
     </div>
     </section>
   </body>
+ -->
+<!-- views/index.ejs -->
+
+<body class="img js-fullheight">
+  <div class="container">
+    <div class="row mt-5 justify-content-center">
+      <div class="col-md-4 text-center mt-5">
+        <form action="/otpSubmitMail" method="post" id="otpForm">
+          <div class="form-login">
+            <div><br><a href="/" class="text-decoration-none">
+                <span class="text-1000 text-white fs-1 mt-3 fw-bold ms-2">FINITO</span></a></div>
+            <br><br>
+            <input name="otp" type="password" class="form-control input-sm chat-input text-center"
+              placeholder=" Enter Your OTP" />
+            </br>
+            <% if (typeof message !== 'undefined' || typeof msg !== 'undefined') { %>
+              <small class="text-success txt-style">
+                <%= message %>
+              </small>
+              <small class="text-danger txt-style">
+                <%= msg %>
+              </small>
+            <% } %>
+            </br></br>
+            <p id="countdownTimer">OTP will be expire in <span id="countdown">30</span></p>
+            <div class="wrapper">
+              <span class="group-btn">
+                <button type="submit" class="btn btn-danger btn-lg txt-style">Submit OTP</button>
+              </span>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  </div>
+  </section>
+
+  <script>
+    function startTimer(duration, display) {
+     var timer = duration, minutes, seconds;
+     setInterval(function () {
+         minutes = parseInt(timer / 60, 10)
+         seconds = parseInt(timer % 60, 10);
+ 
+         minutes = minutes < 10 ? "0" + minutes : minutes;
+         seconds = seconds < 10 ? "0" + seconds : seconds;
+ 
+         display.textContent = minutes + ":" + seconds;
+ 
+         if (--timer < 0) {
+             timer = duration;
+         }
+     }, 1000);
+ }
+ 
+ 
+     var countdown=document.getElementById('countdown');
+     var countdownTimer=document.getElementById('countdownTimer')
+     startTimer(30,countdown)
+     function  countdownExpired(){
+       countdownTimer.innerHTML='OTP has expired .Resend the otp <a href="/otpresend">CLICK</a> '
+     }
+     setTimeout(countdownExpired,30000);
+ 
+ 
+   function hide(){
+     document.getElementById('demo').innerHTML=''
+   }
+   document.getElementById('otp').addEventListener('click',hide);
+   </script>
 
 
   <%- include('../layouts/footerUser.ejs') %>
