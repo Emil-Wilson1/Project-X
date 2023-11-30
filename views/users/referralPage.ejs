@@ -1,0 +1,36 @@
+<%- include('../layouts/headerUser.ejs') %>
+
+<body class="img js-fullheight">
+  <div class="container">
+    <div class="row mt-5 justify-content-center">
+      <div class="col-md-4 text-center mt-5">
+        <form action="/referralSubmit" method="post" id="otpForm">
+          <div class="form-login">
+            <div><br><a href="/" class="text-decoration-none">
+                <span class="text-1000 text-white fs-1 mt-3 fw-bold ms-2">FINITO</span></a></div>
+            <br><br>
+            <input name="ref" type="password" class="form-control input-sm chat-input text-center"
+              placeholder=" Enter Your Code" />
+            </br>
+            <% if (typeof message !== 'undefined' || typeof msg !== 'undefined') { %>
+              <h6 class="text-success txt-style">
+                <%= message %>
+              </h6>
+              <h6 class="text-danger txt-style">
+                <%= msg %>
+              </h6>
+            <% } %>
+            </br></br>
+            <!-- <p id="countdownTimer">OTP will be expire in <span id="countdown">30</span></p> -->
+            <div class="wrapper">
+              <span class="group-btn">
+                <button type="submit" class="btn btn-danger btn-lg txt-style">Submit</button>
+              </span>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  </div>
+  </section>
+    <%- include('../layouts/footerUser.ejs') %>

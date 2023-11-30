@@ -19,6 +19,9 @@ const userSchema = mongoose.Schema({
     image: {
         type: Buffer,
     },
+    address: {
+        type: Array
+    },
     is_admin: {
         type: Number,
         required: true
@@ -35,7 +38,13 @@ const userSchema = mongoose.Schema({
     }, wishlist: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Products'
-    }]
+    }], wallet: {
+        type: Number,
+    },redeemed:{
+        type:Boolean,
+        default:false
+        }
+    
 })
 
 module.exports = mongoose.model('User', userSchema)

@@ -3,7 +3,10 @@ const productSchema = require('../models/productModel')
 const sharp = require('sharp')
 const path = require('path');
 require('dotenv').config();
-
+const fs = require('fs');
+const { ObjectId } = require('mongodb');
+const { query } = require('express')
+const imagesDir=path.join(__dirname,'..','public','proImage','temp')
 let msg
 let message
 // SHOW PRODUCTS
@@ -67,7 +70,7 @@ const loadEditPage = async (req, res) => {
     try {
         const id = req.query.id
         const products = await productSchema.findOne({ _id: new Object(id) }).populate('category')
-        const category = await categorySchema.find()
+        const category = await categorySchema.find({is_List:true})
         res.render('editProduct', { product: products, category: category, msg })
         msg = null
     } catch (error) {
@@ -79,7 +82,7 @@ const loadEditPage = async (req, res) => {
 
 const newProduct = async (req, res) => {
     try {
-        const category = await categorySchema.find()
+        const category = await categorySchema.find({is_List:true})
         res.render('addProduct', { category: category, message, msg })
         message = null
         msg = null
@@ -152,7 +155,7 @@ const editProduct = async (req, res) => {
     try {
         const prod = req.body
         const id = req.query.id
-        const catId = await categorySchema.findOne({ category: prod.category })
+        const catId = await categorySchema.findOne({ category: prod.category,is_List:true})
         if (prod.title.trim().length == 0 || prod.price.trim().length == 0 || prod.stocks.trim().length == 0 || prod.category.length == 0 || prod.brand.trim().length == 0 || prod.description.trim().length == 0) {
             msg = 'Full field should be filled'
             res.redirect('/admin/products')
@@ -218,6 +221,29 @@ const editProduct = async (req, res) => {
     }
 }
 
+const singleRemove=async(req,res)=>{
+    try {
+        const index=req.body.index
+        const id=req.body.id
+        const productImage=await productSchema.findById(id)
+        const image=productImage.image[index]
+        const remove=await productSchema.updateOne({_id:id},{$pullAll:{image:[image]}})
+        if(remove){
+            res.json({success:true})
+            res.redirect('/admin/editProduct')
+        }else{
+            res.redirect('/admin/editProduct')
+        }
+    } catch (error) {
+        console.log(error.message)
+    }
+}
+
+
+
+
+
+
 
 module.exports={
     newProduct,
@@ -226,4 +252,5 @@ module.exports={
     deleteProduct,
     loadEditPage,
     editProduct,
+    singleRemove,
 }

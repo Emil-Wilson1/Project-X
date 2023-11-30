@@ -14,12 +14,24 @@ let msg
 
 const loadHome = async (req, res, next) => {
     try {
+        let counter;
         let session = req.session.user_id
         const products = await productSchema.find({ is_show: true }).sort({ _id: -1 }).limit(4)
-
-        res.render('home', { product: products, session, msg, message })
-        msg = null,
-            message = null
+        if(session!=null){
+        const user = await User.findOne({ _id: session });
+         counter= await cartSchema.aggregate([{ $match: {userId: user._id} }, { $unwind: "$item" },
+        { $group: { _id: null, total: { $sum: "$item.quantity" } } },
+        {
+            $project: { _id: 0 }
+        }])
+        res.render('home', { product: products, session, msg, message,counter: counter[0]?.total || 0})
+    }else{
+        res.render('home', { product: products, session, msg, message})
+            msg = null,
+           message = null
+    }
+       
+      
     } catch (err) {
         console.log(err);
         next(err.message)
@@ -54,10 +66,10 @@ const loadShopPage = async (req, res, next) => {
         const session = req.session.user_id
         const count = await productSchema.find({ is_show: true }).countDocuments()
         const product = await productSchema.find({ is_show: true }).limit(6).skip((page - 1) * 6).exec()
-        const category = await categoryModel.find()
+        const category = await categoryModel.find({is_List:true})
         res.render('shopPage', { session, product, category, message, msg, totalPages: Math.ceil(count / 6) })
         msg = null,
-            message = null
+        message = null
     } catch (error) {
         console.log(error.message);
         next(error.message)
@@ -75,7 +87,7 @@ const loadCart = async (req, res, next) => {
             cartProducts.item.forEach(value => totalPrice += value.price * value.quantity);
         }
         await cartSchema.updateOne({ userId: session }, { $set: { totalPrice: totalPrice } })
-        res.render('cart', { session, cartProducts, totalPrice,msg,})
+        res.render('cart', { session, cartProducts, totalPrice,msg,message})
         msg = null
     } catch (error) {
         console.log(error);
@@ -86,24 +98,23 @@ const loadCart = async (req, res, next) => {
 // ADD TO CART
 const addToCart = async (req, res, next) => {
     try {
-        const product_Id = req.query.id
-        const user_Id = req.session.user_id
+        const product_Id = req.query.id;
+        const user_Id = req.session.user_id;
 
-        const product = await productSchema.findOne({ _id: new Object(product_Id) })
+        const product = await productSchema.findOne({ _id: new Object(product_Id) });
         const userCart = await cartSchema.findOne({ userId: user_Id });
-        const cartCount = await cartSchema.findOne({ userId: user_Id, "item.product": product_Id })
-        const wishList = await User.findOne({ _id: user_Id })
+        const cartCount = await cartSchema.findOne({ userId: user_Id, "item.product": product_Id });
 
         if (userCart) {
             const itemIndex = userCart.item.findIndex(item => item.product._id.toString() === product_Id);
             if (itemIndex >= 0) {
                 if (cartCount) {
-                    const item = cartCount.item.find(item => item.product.toString() === product_Id)
+                    const item = cartCount.item.find(item => item.product.toString() === product_Id);
                     if (item) {
                         if (item.quantity >= product.stocks) {
                             const referer = req.headers.referer || "/";
                             res.redirect(referer);
-                            msg = 'Item out of stock'
+                            msg='Item out of stock';
                         } else {
                             await cartSchema.updateOne({ userId: user_Id, "item.product": product_Id }, { $inc: { "item.$.quantity": 1 } });
                         }
@@ -113,43 +124,34 @@ const addToCart = async (req, res, next) => {
                 if (product.stocks < 1) {
                     const referer = req.headers.referer || "/";
                     res.redirect(referer);
-                    msg = 'Item out of stock'
+                    msg='Item out of stock';
                 } else {
-
                     await cartSchema.updateOne(
                         { userId: user_Id },
                         { $push: { item: { product: product_Id, price: product.price, quantity: 1 } } }
                     );
-                    if (wishList.wishlist.includes(product_Id)) {
-                        wishList.wishlist.pull(product_Id);
-                        await wishList.save();
-                    }
                 }
             }
         } else {
             if (product.stocks < 1) {
                 const referer = req.headers.referer || "/";
                 res.redirect(referer);
-                msg = 'Item out of stock'
+                msg='Item out of stock';
             } else {
                 await cartSchema.insertMany({ userId: user_Id, item: [{ product: product_Id, price: product.price, quantity: 1 }] });
-                if (wishList.wishlist.includes(product_Id)) {
-                    await User.updateOne({ _id: user_Id }, { $unset: { wishlist: product_Id } })
-                }
             }
         }
 
         const referer = req.headers.referer || "/";
         res.redirect(referer);
-        message = 'Item successfully added'
-
+         message='Item successfully added';
     } catch (error) {
         console.log(error);
-        next(error.message)
+        next(error.message);
     }
-}
+};
 
-
+  
 
 const incrementCart = async (req, res, next) => {
     try {
@@ -243,78 +245,12 @@ const removeCart = async (req, res, next) => {
 }
 
 
-///////////LOAD WISHLIST//////////////
-
-const loadWishList = async (req, res, next) => {
-    try {
-        const session = req.session.user_id
-        const wishlist = await User.findOne({ _id: session }).populate('wishlist')
-        res.render('wishList', { session, wishlist, message })
-        message = null
-    } catch (error) {
-        console.log(error.message);
-        next(error.message)
-    }
-}
-
-//////////ADD TO WISHLIST////////////
-
-const addToWishlist = async (req, res, next) => {
-    try {
-        const session = req.session.user_id
-        const productId = req.query.id
-        const user = await User.findOne({ _id: session })
-        const cart = await cartSchema.findOne({ userId: session, "item.product": productId })
-        if (cart) {
-            msg = 'product already in cart'
-            const referer = req.headers.referer || "/";
-            res.redirect(referer);
-        } else {
-            if (!user.wishlist.includes(productId)) {
-                user.wishlist.push(productId)
-                await user.save()
-                const referer = req.headers.referer || "/";
-                res.redirect(referer);
-                message = 'Item added to wishlist'
-            } else {
-                const referer = req.headers.referer || "/";
-                res.redirect(referer);
-                msg = 'Item already in wishist'
-            }
-        }
-
-    } catch (error) {
-        console.log(error.message);
-        next(error.message)
-    }
-}
-
-/////////////REMOVE FROM WISHLIST//////
-
-const removeWishlist = async (req, res, next) => {
-    try {
-        const session = req.session.user_id
-        const product = req.query.id
-        const del = await User.findOne({ _id: session })
-        del.wishlist.pull(product);
-        await del.save();
-        res.redirect('/wishlist')
-    } catch (error) {
-        console.log(error.message);
-        next(error.message)
-    }
-}
-
-
 module.exports={
     loadCart,
     addToCart,
     incrementCart,
     decrementCart,
     removeCart,
-    loadWishList,
-    addToWishlist,
-    removeWishlist,
     loadHome,
     productDetails,
     loadShopPage,

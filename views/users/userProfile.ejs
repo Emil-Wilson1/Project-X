@@ -1,0 +1,397 @@
+<%- include('../layouts/headerUser.ejs') %>
+
+<style>
+  /* Optional custom CSS for referral code box */
+  .referral-code-box {
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+  }
+  .copy-button {
+    margin-top: 10px;
+  }
+</style>
+
+
+
+
+
+  <div class="offcanvas-menu-overlay"></div>
+  <div class="offcanvas-menu-wrapper">
+    <div class="offcanvas__close">+</div>
+    <ul class="offcanvas__widget">
+      <li><a href="/wishlist"><span class="icon_heart_alt"></span>
+
+        </a></li>
+      <li><a href="/cart"><span class="icon_bag_alt"></span>
+
+        </a></li>
+    </ul>
+    <!-- <div class="offcanvas__logo">
+        <a href="/"></a>
+    </div> -->
+    <div id="mobile-menu-wrap"></div>
+    <div class="offcanvas__auth">
+      <% if(session!=null){ %>
+        <a class="dropdown-item" href="/logout">Logout</a>
+        <% }else{%>
+          <a class="dropdown-item" href="/login">Login</a>
+          <a class="dropdown-item" href="/signup">Signup</a>
+          <%}%>
+    </div>
+  </div>
+
+
+
+
+  <header class="header">
+    <div class="container-fluid">
+      <div class="row justify-content-center align-items-center">
+        <div class="col-lg-4 col-md-4 ">
+          <div class="header__logo ml-3">
+            <a href="/" class="text-decoration-none">
+              <span class="text-1000 text-dark fs-1 mt-3 fw-bold ms-2">FINITO</span></a>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-4">
+          <nav class="header__menu row ">
+            <div class="col-2 ">
+              <a href="/">Home</a>
+            </div>
+            <div class="col-2">
+              <a class="" href="/shopPage">Shop</a>
+            </div>
+            <div class="col-2 ">
+              <a class="text-danger active" href="/userProfile">Profile</a>
+            </div>
+          </nav>
+        </div>
+        <div class="col-lg-4 col-md-4 ">
+          <div class="header__right row ">
+            <div class="header__right__auth col">
+              <div class="btn-group">
+                <ul class="header__right__widget mt-2 mr-3">
+
+                  <li><a href="/wishlist" data-bs-toggle="tooltip" data-bs-placement="top" title="Wishlist"><span
+                        class="icon_heart_alt"></span></a></li>
+                  <li><a href="/cart" data-bs-toggle="tooltip" data-bs-placement="top" title="Cart"><span
+                        class="icon_bag_alt"></span></a></li>
+                </ul>
+                <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1"
+                  data-bs-toggle="dropdown"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                    viewBox="0 0 24 24">
+                    <g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd">
+                      <path d="M16 9a4 4 0 1 1-8 0a4 4 0 0 1 8 0Zm-2 0a2 2 0 1 1-4 0a2 2 0 0 1 4 0Z" />
+                      <path
+                        d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11s11-4.925 11-11S18.075 1 12 1ZM3 12c0 2.09.713 4.014 1.908 5.542A8.986 8.986 0 0 1 12.065 14a8.984 8.984 0 0 1 7.092 3.458A9 9 0 1 0 3 12Zm9 9a8.963 8.963 0 0 1-5.672-2.012A6.992 6.992 0 0 1 12.065 16a6.991 6.991 0 0 1 5.689 2.92A8.964 8.964 0 0 1 12 21Z" />
+                    </g>
+                  </svg>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                  <% if(session!=null){ %>
+                    <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                    <% }else{%>
+                      <li><a class="dropdown-item" href="/login">Login</a></li>
+                      <li><a class="dropdown-item" href="/signup">Signup</a></li>
+                      <%}%>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="canvas__open">
+        <i class="fa fa-bars"></i>
+      </div>
+    </div>
+  </header>
+
+
+
+
+
+
+  <section style="background-color:white;">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-4">
+          <div class="card mb-4">
+            <div class="card-body text-center">
+              <%if(userData.image){%>
+                <img src="/userProfileIMG/<%=userData.image%>" alt="avatar" class="rounded-circle img-fluid"
+                  style="width: 150px; height: 150px;">
+                <%}else{%>
+                  <img src="https://storage.needpix.com/rsynced_images/blank-profile-picture-973460_1280.png"
+                    alt="avatar" class="rounded-circle img-fluid" style="height: 150px;width: 150px;">
+                  <%}%>
+                    <h5 class="my-3">
+                      <%=userData.username%>
+                    </h5>
+                    <div class="d-flex justify-content-center mb-2">
+                      <a href="/editProfile" class="btn btn-primary">Edit Profile</a>
+                      <a href="/changePassword" class="btn btn-outline-primary ms-1">Change Password</a>
+                    </div>
+
+                    <%if(userData.wallet!=undefined){%>
+                      <div class="d-flex justify-content-center mb-2 ">
+                      <a>Wallet : Rs <%=userData.wallet%></a>
+                    </div>
+                      <%}%>
+
+                    <a href="/orderHistory" class="btn btn-lg btn-dark mt-4">Order History</a>
+
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-8">
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Full Name</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">
+                    <%=userData.username%>
+                  </p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Email</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">
+                    <%=userData.email%>
+                  </p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Phone</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">
+                    <%=userData.phone%>
+                  </p>
+                </div>
+              </div>
+              <hr>
+              <div class="row">
+                <div class="col-sm-3">
+                  <p class="mb-0">Address</p>
+                </div>
+                <div class="col-sm-9">
+                  <%if(userData.address==0){%>
+                    <a href="/addAddress" class="btn btn-danger">Add new address</a>
+                    <%}else{%>
+                      <select name="cars" id="cars" style="max-width:90%; height: 30px;">
+                        <%for(i=0;i<userData.address.length;i++){%>
+                          <option value="">
+                            <%= userData.address[i].address %>
+                          </option>
+                          <%}%>
+                      </select>
+                      <%}%>
+                      <!-- <a href="/selectAddress" class="btn btn-primary">Select address</a> -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="referral-code-box">
+          <p class="mb-0">Your Referral Code:</p>
+          <div class="input-group">
+            <input type="text" class="form-control text-dark" value="<%=userData._id%>" id="referralCodeInput" readonly>
+            <div class="input-group-append">
+              <button class="btn btn-primary copy-button mb-4 ml-2" onclick="copyReferralCode()">Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+  
+<div class="container mt-4">
+  <div class="row">
+    <!-- Column for the EJS content -->
+    <div class="col-md-6">
+      <h3 class="text-dark mb-3 mt-3">Do you have a Referral Code?</h3>
+      <a href="/referral" class="btn btn-success">
+        <span class="custom-text">Redeem</span>
+      </a>
+    </div>
+
+    <!-- Column for the existing HTML content -->
+    <div class="col-md-6">
+      <div class="referral-code-box">
+        <p class="mb-0"> Your Referral Code:</p>
+        <div class="input-group">
+          <input type="text" class="form-control text-dark" value="<%=userData._id%>" id="referralCodeInput" readonly>
+          <div class="input-group-append">
+            <button class="btn btn-primary copy-button mb-4 ml-2" onclick="copyReferralCode()">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+  <!-- <% if(orders.length>0){%>
+  <div class="container">
+    <div class="col-12 tm-block-col">
+      <div class="tm-bg-primary-dark tm-block tm-block-taller tm-block-scroll">
+        <h3 class="tm-block-title text-center mb-5 ">Orders</h3>
+        
+          <%for(let i=0;i< orders.length;i++){ %>
+            <table class="table  text-center table-secondary">
+              <thead>
+                <tr class="table-dark">
+                  <th scope="col">Product</th>
+                  <th scope="col">quantity</th>
+                  <th scope="col">price</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Payment</th>
+                </tr>
+              </thead>
+              <tbody>
+                <%for(let j=0;j< orders[i].item.length;j++){%>
+                  <tr scope="row" class="">
+                    <td>
+                      <%=orders[i].item[j].product.title%>
+                    </td>
+                    <td>
+                      <%=orders[i].item[j].quantity%>
+                    </td>
+
+                    <td>
+                        <%=orders[i].item[j].quantity*orders[i].item[j].price%>
+                    </td>
+                  
+                    <% }%>
+                      <%if(orders[i].is_delivered==false){ %>
+                        <td>
+                          On the way
+                        </td>
+                        <%}else{%>
+                          <td>
+                            delivered
+                          </td>
+                          <%}%>
+                          <td>
+                            <%=orders[i].paymentType%>
+                          </td>
+                        
+                  </tr>
+                 
+              </tbody>
+              
+            </table>
+       
+         <a href="/cancelOrder?orderid=<%=orders[i]._id%>" class="btn btn-danger">Cancel order</a>
+            <a href="/orders?orderid=<%=orders[i]._id%>" class="btn btn-primary">order detalils</a>
+            <%}%>
+      </div>
+      
+    </div>
+   
+    </div>
+    <%}%> -->
+
+    <% if(orders.length>0){%>
+      <div class="container">
+        <div class="col-12 tm-block-col">
+          <div class="tm-bg-primary-dark tm-block tm-block-taller tm-block-scroll">
+            <h3 class="tm-block-title text-center mb-5 ">Orders</h3>
+            
+              <%for(let i=0;i<orders.length;i++){ %>
+                <table class="table  text-center table-secondary">
+                  <thead>
+                    <tr class="table-dark">
+                      <th scope="col">Product</th>
+                      <th scope="col">quantity</th>
+                      <th scope="col">price</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Payment</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <%for(let j=0;j<orders[i].item.length;j++){%>
+                      <tr scope="row" class="">
+                        <td>
+                          <%=orders[i].item[j].product.title%>
+                        </td>
+                        <td>
+                          <%=orders[i].item[j].quantity%>
+                        </td>
+    
+                        <td>
+                            <%=orders[i].item[j].quantity*orders[i].item[j].price%>
+                        </td>
+                        <% }%>
+                          <%if(orders[i].is_delivered==false){ %>
+                            <td>
+                              On the way
+                            </td>
+                            <%}else{%>
+                              <td>
+                                delivered
+                              </td>
+                              <%}%>
+                              <td>
+                                <%=orders[i].paymentType%>
+                              </td>
+                            
+                      </tr>
+                  </tbody>
+                </table>
+                <a href="/cancelOrder?orderid=<%=orders[i]._id%>" class="btn btn-danger">Cancel order</a>
+                <a href="/orders?orderid=<%=orders[i]._id%>" class="btn btn-primary">Order detalils</a>
+                <%}%>
+          </div>
+          
+        </div>
+       
+        </div>
+        <%}%>
+
+
+      <%if(message!=null){%>
+        <script>
+          new Swal({
+            title: "Success",
+            text: "<%=message%>",
+            icon: "success",
+            showConfirmButton: false,
+            timer: 2000
+          });
+        </script>
+        <%}%>
+
+
+        <script>
+          function copyReferralCode() {
+            const referralCodeInput = document.getElementById('referralCodeInput');
+            referralCodeInput.select();
+            document.execCommand('copy');
+            alert('Referral code copied to clipboard!');
+          }
+        </script>
+          <%- include('../layouts/footerUser.ejs') %>

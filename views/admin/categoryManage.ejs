@@ -1,5 +1,5 @@
 <%- include('../layouts/header.ejs') %>
-
+<!-- 
 
 <body class="bdy" id="reportsPage">
   <div class="" id="home">
@@ -77,6 +77,16 @@
                 <span class="sr-only">(current)</span>
               </a>
             </li>
+            
+            <li class="nav-item">
+              <a class="nav-link" href="/admin/order">
+                <i class="">
+                <svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 0 448 512"><style>svg{fill:#adb3bd}</style>
+                  <path d="M246.6 470.6c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L224 402.7 361.4 265.4c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3l-160 160zm160-352l-160 160c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L224 210.7 361.4 73.4c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3z"/>
+                </svg></i>
+                Order
+              </a>
+            </li> -->
 
             <!-- <li class="nav-item">
               <a class="nav-link" href="/admin/coupon">
@@ -100,7 +110,7 @@
               </a>
             </li> -->
 
-          </ul>
+          <!-- </ul>
           <ul class="navbar-nav">
             <li class="nav-item">
               <a class="nav-link d-block" href="/admin/logout">
@@ -110,76 +120,151 @@
           </ul>
         </div>
       </div>
-    </nav>
-    <div class="container">
+    </nav> -->
 
-      <div class="col-12 tm-block-col">
+    <style>
+      html, body {
+      height: 100%;
+      margin: 0;
+    }
+    
+    #wrapper {
+      display: flex;
+    }
+    
+    #sidebar-wrapper {
+      min-height: 100vh; /* Set the minimum height of the sidebar to the viewport height */
+     width: 200px;
+    }
+    
+    /* Additional styling for other elements */
+    /* Adjust as needed */
+    #page-content-wrapper {
+      flex: 1;
+      padding: 20px; /* Example padding */
+    }
+    
+    </style>
 
-<div class="tm-bg-primary-dark tm-block tm-block-taller tm-block-scroll">
-  <h2 class="tm-block-title">Category List</h2>
-  <div class="d-flex justify-content-end mt-5 mb-3"><a href="/admin/addCategory" class="btn btn-dark text-white">Add Category</a></div>
-         
-  <table class="table  text-center">
-    <thead>
-      <tr>
-        <th class="th-sm text-center">Name</th>
-        <th class="th-sm text-center">Action</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      <% if(category.length> 0){ %>
-        <% for(let i=0; i<category.length; i++){ %>
-          <tr>
-            <td class="text-center">
-              <%= category[i].category %>
-            </td>
-
-            <td class="text-center"><a class="btn btn-success rounded-pill"
-                href="/admin/editCategory?id=<%= category[i]._id %>" style="font-size: small;">Edit</a>
-              <a class="btn btn-danger rounded-pill" href="/admin/deleteCategory?id=<%= category[i]._id %>"
-                style="font-size: small;">Delete</a>
-            </td>
-          </tr>
-          <% } %>
-            <% } else { %>
-              <tr>
-                <td colspan="2">Categories Not found</td>
-              </tr>
-              <% } %>
-    </tbody>
-  </table>
-</div>
-</div>
-</div>
-        </div>
-
-         <!-- <div class="d-flex justify-content-center mt-5 mb-3"><a href="/admin/addCategory" class="btn btn-dark text-white">Add Category</a></div>
-          -->
-         <% if(message){ %>
-          <script>
-        new Swal({
-          title: "Success",
-          text: "<%=message%>",
-          icon: "success",
-          showConfirmButton:false,
-          timer:2000
-        });
-    </script>
-             <% } %> 
-             <% if(msg){ %>
-              <script>
-            new Swal({
-              title: "Error",
-              text: "<%=msg%>",
-              icon: "error",
-              showConfirmButton:false,
-              timer:2000
-            });
-        </script>
-                 <% } %> 
+    <body id="reportsPage">
+      <div class="d-flex" id="wrapper">
+          <!-- Sidebar -->
+          <div class="bg-dark border-right" id="sidebar-wrapper">
+              <div class="sidebar-heading">
+                  <h1 class="tm-site-title mb-0 font">
+                      <span class="text-1000 text-white fs-1 mt-3 fw-bold ms-2">FINITO</span>
+                  </h1>
+              </div>
+              <div class="list-group list-group-flush">
+                  <!-- Sidebar items -->
+                  <a href="/admin/home" class="list-group-item list-group-item-action bg-dark text-white">
+                      Dashboard
+                  </a>
+                  <a href="/admin/userData" class="list-group-item list-group-item-action bg-dark text-white">
+                      UserData
+                  </a>
+                  <a href="/admin/addProduct" class="list-group-item list-group-item-action bg-dark text-white">
+                      Add Product
+                  </a>
+                  <a href="/admin/products" class="list-group-item list-group-item-action bg-dark text-white">
+                      Products
+                  </a>
+                  <a href="/admin/category" class="list-group-item list-group-item-action bg-dark text-white">
+                      Category
+                  </a>
+                  <a href="/admin/order" class="list-group-item list-group-item-action bg-dark text-white">
+                      Order
+                  </a>
+              </div>
+              <!-- Additional sidebar items -->
+          </div>
+          <!-- /#sidebar-wrapper -->
   
-  </div>
+          <!-- Page Content -->
+          <div id="page-content-wrapper">
+              <div class="container-fluid">
+                  <!-- Your existing content -->
+                  <!-- ... -->
+                  <div class="container">
+
+                    <div class="col-12 tm-block-col">
+              
+              <div class="tm-bg-primary-dark tm-block tm-block-taller tm-block-scroll">
+                <h2 class="tm-block-title">Category List</h2>
+                <div class="d-flex justify-content-end mt-5 mb-3"><a href="/admin/addCategory" class="btn btn-dark text-white">Add Category</a></div>
+                       
+                <table class="table  text-center">
+                  <thead>
+                    <tr>
+                      <th class="th-sm text-center">Name</th>
+                      <th class="th-sm text-center">Action</th>
+                    </tr>
+                  </thead>
+              
+                  <tbody>
+                    <% if (category.length > 0) { %>
+                      <% for (let i = 0; i < category.length; i++) { %>
+                        <tr>
+                          <td class="text-center">
+                            <%= category[i].category %>
+                          </td>
+                          <td class="text-center">
+                            <a class="btn btn-success rounded-pill" href="/admin/editCategory?id=<%= category[i]._id %>" style="font-size: small;">Edit</a>
+                            <% if (category[i].is_List == true) { %>
+                              <a class="btn btn-danger rounded-pill" href="/admin/deleteCategory?id=<%= category[i]._id %>" style="font-size: small;">Unlist</a>
+                            <% } else { %>
+                              <a class="btn btn-success rounded-pill" href="/admin/showCategory?id=<%= category[i]._id %>" style="font-size: small;">List</a>
+                            <% } %>
+                          
+              
+              
+                          </td>
+                        </tr>
+                        <% } %>
+                          <% } else { %>
+                            <tr>
+                              <td colspan="2">Categories Not found</td>
+                            </tr>
+                            <% } %>
+                  </tbody>
+                </table>
+              </div>
+              </div>
+              </div>
+                      </div>
+              
+                    
+                       <% if(message){ %>
+                        <script>
+                      new Swal({
+                        title: "Success",
+                        text: "<%=message%>",
+                        icon: "success",
+                        showConfirmButton:false,
+                        timer:2000
+                      });
+                  </script>
+                           <% } %> 
+                           <% if(msg){ %>
+                            <script>
+                          new Swal({
+                            title: "Error",
+                            text: "<%=msg%>",
+                            icon: "error",
+                            showConfirmButton:false,
+                            timer:2000
+                          });
+                      </script>
+                               <% } %> 
+                
+                </div>
+              </div>
+          </div>
+          <!-- /#page-content-wrapper -->
+      </div>
+  </body>
+  
+
   
   <script>
 

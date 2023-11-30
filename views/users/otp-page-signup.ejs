@@ -49,12 +49,12 @@
               placeholder=" Enter Your OTP" />
             </br>
             <% if (typeof message !== 'undefined' || typeof msg !== 'undefined') { %>
-              <small class="text-success txt-style">
+              <h6 class="text-success txt-style">
                 <%= message %>
-              </small>
-              <small class="text-danger txt-style">
+              </h6>
+              <h6 class="text-danger txt-style">
                 <%= msg %>
-              </small>
+              </h6>
             <% } %>
             </br></br>
             <p id="countdownTimer">OTP will be expire in <span id="countdown">30</span></p>
@@ -93,7 +93,7 @@
      var countdownTimer=document.getElementById('countdownTimer')
      startTimer(30,countdown)
      function  countdownExpired(){
-       countdownTimer.innerHTML='OTP has expired .Resend the otp <a href="/otpresend">CLICK</a> '
+       countdownTimer.innerHTML='OTP has expired .Resend the otp <a href="/resend">CLICK</a> '
      }
      setTimeout(countdownExpired,30000);
  

@@ -1,6 +1,40 @@
 <%- include('../layouts/headerUser.ejs') %>
+<style>
+    .cart-icon {
+  position: relative;
+  display: inline-block;
+  align-items: center;
+}
+
+.icon_bag_alt {
+  /* Your icon styles here */
+  /* For example: */
+  font-size: 24px;
+  color: black;
+}
 
 
+
+.cart-counter {
+  position: absolute;
+  bottom: 10px;
+  right: -8px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 5px;
+  width: 20px; /* Set the width and height to create a circle */
+  height: 20px; /* Same as width for a perfect circle */
+  text-align: center;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 20px; /* Center the text vertically */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+</style>
 
     
 
@@ -63,7 +97,18 @@
                                 <ul class="header__right__widget mt-2 mr-3">
                                     
                                     <li><a href="/wishlist" data-bs-toggle="tooltip" data-bs-placement="top" title="Wishlist"><span class="icon_heart_alt"></span></a></li>
+                                    <% if(session==null){%>
                                     <li><a href="/cart" data-bs-toggle="tooltip" data-bs-placement="top" title="Cart"><span class="icon_bag_alt"></span></a></li>
+                                    <% }else{%>
+                                    <div class="cart-icon">
+                                        <a href="/cart">
+                                          <span class="icon_bag_alt"></span>
+                                          <span class="cart-counter"><%= counter%></span>
+                                        </a>
+                                      </div>
+                                      <%}%>
+                                   
+                                    
                                 </ul>
                                 <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1"
                                     data-bs-toggle="dropdown"><svg xmlns="http://www.w3.org/2000/svg" width="24"
@@ -156,8 +201,9 @@
                                     <ul class="product__hover">
                                         <li><a href="/proImage/<%=product[i].image[0]%>" class="image-popup"><span
                                                     class="arrow_expand"></span></a></li>
-                                        <li><a href="/addToWishlist?id=<%=product[i]._id%>"><span class="icon_heart_alt"></span></a></li>
+                                        <li><a href="#"><span class="icon_heart_alt"></span></a></li>
                                         <li><a href="/addToCart?id=<%=product[i]._id%>"><span class="icon_bag_alt"></span></a></li>
+                                       
                                     </ul>
                                 </div>
                                 <div class="product__item__text">
@@ -209,6 +255,8 @@
         </div>
     </section>
     <!-- Footer Section End -->
+ 
+      
 
 
     <%if(msg!=null){%>
@@ -235,10 +283,6 @@
       </script>
       <%}%>
 
-
-
-      
-
-      
+     
 
     <%- include('../layouts/pagesFooter.ejs') %>

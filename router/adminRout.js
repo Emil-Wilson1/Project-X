@@ -3,6 +3,7 @@ const multer = require('../config/multer')
 const adminController = require('../controllers/adminController')
 const productController=require('../controllers/productController')
 const categoryController=require('../controllers/categoryController')
+const orderController=require('../controllers/orderController')
 const auth = require('../middleware/authAdmin')
 // const userBlock=require('../middleware/userBlock')
 
@@ -42,6 +43,16 @@ admin_rout.get('/editProduct',auth.logOutSession,productController.loadEditPage)
 
 admin_rout.post('/editProduct',upload.array('image',4),productController.editProduct)
 
+// admin_rout.get('/deleteImage', auth.logOutSession, productController.deleteImage);
+
+admin_rout.get('/cancelOrder',auth.logOutSession,orderController.cancelOrder)
+
+admin_rout.get('/orderStatus',auth.logOutSession,orderController.orderStatus)
+
+admin_rout.get('/order', auth.logOutSession, orderController.loadOrder)
+
+
+// admin_rout.get('/admin/home', auth.logOutSession, orderController.loadAdminHome)
 
 
 admin_rout.get('/category',auth.logOutSession,categoryController.categoryManage)
@@ -55,6 +66,10 @@ admin_rout.get('/editCategory',auth.logOutSession,categoryController.loadEditCat
 admin_rout.post('/editCategory',auth.logOutSession,categoryController.editCategory)
 
 admin_rout.get('/deleteCategory',auth.logOutSession,categoryController.categoryDelete)
+
+admin_rout.post('/proImage',auth.logOutSession,productController.singleRemove)
+
+admin_rout.get('/salesReport',auth.logOutSession,adminController.loadSalesPage)
 
 
 

@@ -18,7 +18,8 @@ app.use(nocache())
 app.set('view engine','ejs')
 app.set('views','./views/users')
 
-app.use(session({ secret:'key' , cookie: { maxAge: 60000 * 100 }, saveUninitialized: true, resave: true }))
+app.use(session({ secret:process.env.KEY , cookie: { maxAge: 60000 * 100 }, saveUninitialized: true, resave: true }))
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
