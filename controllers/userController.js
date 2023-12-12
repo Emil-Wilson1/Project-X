@@ -3,9 +3,10 @@ const productSchema = require('../models/productModel')
 const bcrypt = require('bcrypt')
 const nodemailer = require('nodemailer')
 const categoryModel = require('../models/categoryModel')
-const salesSchema=require('../models/salesReport')
+const salesSchema = require('../models/salesReport')
 const couponSchema = require('../models/couponModel')
 const orderSchema = require('../models/orderModel')
+const offerSchema = require('../models/offerModel')
 const cartSchema = require('../models/cartModel')
 const randomString = require('randomstring')
 const { reset } = require('nodemon')
@@ -100,34 +101,74 @@ const referral = async (req, res, next) => {
         next(error.message)
     }
 }
-const referralSubmit= async (req,res,next)=>{
+// const referralSubmit = async (req, res, next) => {
+//     try {
+//         const referer = req.body.ref
+//         const session = req.session.user_id
+//         console.log(session)
+
+//         const user = await User.find({referalId:referer})
+
+//         const redeemed=await User.find({_id:session},{redeemed:false})
+//         console.log(redeemed);
+//         console.log(user)
+//         if (referer.trim() == 0) {
+//             res.redirect("/referral")
+//             msg = "Please enter the code"
+
+//         }else if (user  && redeemed) {
+//             await User.updateMany({ _id: user._id }, { $inc: { wallet: 100 } })
+//             await User.updateOne({ _id: session }, { $inc: { wallet: 50 } })
+//             await User.updateOne({_id:session},{$set:{redeemed:true}})
+//             console.log("100 credited");
+//             res.redirect("/userProfile")
+//             message = "Successfully Redeemed"
+//         } else {
+//             res.redirect("/referral")
+//             msg = "Incorrect Code!"
+//         }
+
+
+//         console.log("ty")
+//     } catch (error) {
+//         console.log(error);
+//     }
+// }
+
+const referralSubmit = async (req, res, next) => {
     try {
-        const referer=req.body.ref
-        const session=req.session.user_id
-        console.log(session)
-        const user=await User.find({_id:referer})
+        const referer = req.body.ref;
+        const session = req.session.user_id;
+        console.log(session);
+        console.log(referer);
+
+        const user = await User.findOne({ referalId: referer });
+        const userSession = await User.findOne({ _id: session, redeemed: false });
         console.log(user)
-        if(referer.trim()==0){
-            res.redirect("/referral")
-            msg="Please enter the code"
-           
-        }else if(user && session!=referer){
-            await User.updateOne({_id:user},{$inc :{wallet:100} })
-            await User.updateOne({_id:session},{$inc:{wallet:50}})
+        console.log(userSession);
+
+        if (!referer.trim()) {
+            res.redirect("/referral");
+            msg = "Please enter the code";
+        } else if (user && userSession && user._id.toString() !== session) {
+            await User.updateOne({ _id: user._id }, { $inc: { wallet: 100 } });
+            await User.updateOne({ _id: session }, { $inc: { wallet: 50 } });
+            await User.updateOne({ _id: session }, { $set: { redeemed: true } });
             console.log("100 credited");
-            res.redirect("/userProfile")
-            message="Successfully Redeemed"
-        }else{
-            res.redirect("/referral")
-            msg="Incorrect Code!"
+            res.redirect("/userProfile");
+            message = "Successfully Redeemed";
+        } else {
+            res.redirect("/referral");
+            msg = "Incorrect Code!";
         }
 
-      
-        console.log("ty")
+        console.log("ty");
     } catch (error) {
         console.log(error);
     }
 }
+
+
 
 
 /////////USER SUIGNUP//////////
@@ -152,7 +193,7 @@ const insertUser = async (req, res, next) => {
     const checkMail = await User.findOne({ email: usd.email, is_verified: 1 })
     const checkMob = await User.findOne({ phone: usd.phone, is_verified: 1 })
     otpCheckMail = req.body.email;
-
+    let codeId = randomString.generate(12)
     try {
         if (!usd.email && !usd.phone && !usd.password && !usd.username) {
             res.redirect('/signup')
@@ -192,7 +233,8 @@ const insertUser = async (req, res, next) => {
                 email: usd.email,
                 phone: usd.phone,
                 password: paswwordSec,
-                is_admin: 0
+                is_admin: 0,
+                referalId: codeId
             })
         }
 
@@ -568,31 +610,51 @@ const newPassword = async (req, res) => {
 }
 
 
+// const addNewPassword = async (req, res) => {
+//     try {
+//         const password = req.body.password
+//         const Rpassword = req.body.Rpassword
+//         console.log(password)
+//         console.log(Rpassword)
+//         const user = req.body.username
+//         console.log(user)
+//         if (password == Rpassword) {
+//             const secure = await securePassword(password)
+//             console.log(secure)
+//             const userData = await User.updateOne({ username: user }, { $set: { password: secure, token: '' } })
+//             console.log(userData)
+
+//             res.redirect('/login')
+//         } else {
+//             res.redirect('/restpass')
+//             msg = "Entered password is not matching!!"
+//         }
+//     } catch (error) {
+//         console.log(error.message)
+//         // res.render('user/505');
+//     }
+// }
+
 const addNewPassword = async (req, res) => {
     try {
-        const password = req.body.password
-        const Rpassword = req.body.Rpassword
-        console.log(password)
-        console.log(Rpassword)
-        const user = req.body.username
-        console.log(user)
-        if (password == Rpassword) {
-            const secure = await securePassword(password)
-            console.log(secure)
-            const userData = await User.updateOne({ username: user }, { $set: { password: secure, token: '' } })
-            console.log(userData)
+        const password = req.body.password;
+        const Rpassword = req.body.Rpassword;
+        const user = req.body.username;
 
-            res.redirect('/login')
+        if (password === Rpassword) {
+            const secure = await securePassword(password);
+            const userData = await User.updateOne({ username: user }, { $set: { password: secure, token: '' } });
+
+            res.redirect('/login');
         } else {
-            res.redirect('/restpass')
-            msg = "Entered password is not matching!!"
+            res.redirect('/restpass');
+            msg = 'Entered passwords do not match';
         }
     } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
         // res.render('user/505');
     }
-}
-
+};
 
 
 
@@ -641,33 +703,140 @@ const addNewAddress = async (req, res, next) => {
 //////LOAD CHEK OUT PAGE///////////
 
 
+// const loadChekOut = async (req, res, next) => {
+//     try {
+//         let maxDiscount
+//         index = req.query.index
+//         const id = req.session.user_id
+//         const session = req.session.user_id
+//         // const cart = await cartSchema.findOne({ userId: session }).populate('item.product')
+//         const cart = await cartSchema
+//             .findOne({ userId: session })
+//             .populate({
+//                 path: 'item.product',
+//                 populate: {
+//                     path: 'category',
+//                     model: 'category' // Assuming 'category' is the model name for the category schema
+//                 }
+//             });
+
+//         for (const item of cart.item) {
+//             const categoryId = item.product.category._id; // Assuming '_id' is the ID field of the category
+
+//             // Check if there is an offer for the category
+//             const offer = await offerSchema.findOne({ category: categoryId });
+
+//             if (offer) {
+//                 maxDiscount = offer.maxDiscount;
+//                 console.log(`Category ${categoryId} has a maximum discount of ${maxDiscount}`);
+//                 // Perform further operations with the maxDiscount value or the offer data
+//             }
+//         }
+//         if (cart && cart.item && cart.item.length > 0) {
+//             const cartItemIds = cart.item.map(item => item.product); // Extracting product IDs from items in the cart
+
+//             const totalDiscount = await offerSchema.aggregate([
+//                 { $match: { category: { $in: cartItemIds } } }, // Match offers based on the product IDs in the cart
+//                 {
+//                     $group: {
+//                         _id: null,
+//                         totalDiscount: { $sum: '$maxDiscount' } // Calculate total discount
+//                     }
+//                 }
+//             ]);
+
+//             let dis = 0; // Initialize the discount variable
+
+//             if (totalDiscount.length > 0) {
+//                 dis = totalDiscount[0].totalDiscount; // Set 'dis' as the total calculated discount
+//             }
+
+//         //const dis = maxDiscount
+//         const user = await User.findOne({ _id: session })
+//         const coupons = await couponSchema.find()
+//         const offer = await offerSchema.find()
+//         const addressCount = user.address[index]
+//         if (cart != null) {
+//             if (cart.item != 0) {
+//                 res.render('checkOut', { session, cart, user, addressCount, coupons, offer, maxDiscount, dis })
+//             } else {
+//                 res.redirect('/cart')
+//                 msg = "Your cart is empty"
+//             }
+//         } else {
+//             res.redirect('/cart')
+//             msg = "Your cart is empty"
+//         }
+//     }
+//     } catch (error) {
+//         console.log(error);
+//         next(error.message)
+//     }
+
+// }
+
+
 const loadChekOut = async (req, res, next) => {
     try {
+        let maxDiscount;
+        let index = req.query.index; // Declare the 'index' variable with 'let'
+        const session = req.session.user_id;
+        let categoryOffer;
 
-        index = req.query.index
-        const id = req.session.user_id
-        const session = req.session.user_id
-        const cart = await cartSchema.findOne({ userId: session }).populate('item.product')
-        const user = await User.findOne({ _id: session })
-        const coupons = await couponSchema.find()
-        const addressCount = user.address[index]
-        if (cart != null) {
-            if (cart.item != 0) {
-                res.render('checkOut', { session, cart, user, addressCount,coupons})
-            } else {
-                res.redirect('/cart')
-                msg = "Your cart is empty"
+
+        const cart = await cartSchema
+            .findOne({ userId: session })
+            .populate({
+                path: 'item.product',
+                populate: {
+                    path: 'category',
+                    model: 'category' // Assuming 'category' is the model name for the category schema
+                }
+            });
+
+
+        let totalCategoryDiscount = 0;
+        let totalPrice = 0;
+
+        if (cart && cart.item && cart.item.length > 0) {
+            for (const item of cart.item) {
+                const categoryId = item.product.category._id;
+
+                totalPrice += item.product.price * item.quantity;
+                // Find category offer for the item's category
+                categoryOffer = await offerSchema.findOne({ category: categoryId });
+
+                if (categoryOffer) {
+                    // Calculate category offer for the item
+                    const categoryDiscount = categoryOffer.maxDiscount;
+                    // Accumulate the category discounts for the total
+                    totalCategoryDiscount += categoryDiscount;
+
+                }
             }
-        } else {
-            res.redirect('/cart')
-            msg = "Your cart is empty"
+
+
+            const user = await User.findOne({ _id: session });
+            const coupons = await couponSchema.find();
+            const offer = await offerSchema.find();
+            const addressCount = user.address[index];
+
+            if (cart != null) {
+                if (cart.item.length > 0) { // Check if items exist in the cart
+                    res.render('checkOut', { session, cart, user, addressCount, coupons, offer, maxDiscount, dis: totalCategoryDiscount, totalPrice, categoryOffer });
+                } else {
+                    res.redirect('/cart');
+                    msg = "Your cart is empty";
+                }
+            }
+
         }
     } catch (error) {
         console.log(error);
-        next(error.message)
+        next(error.message);
     }
+};
 
-}
 
 
 ////////LOAD SELECT ADDRESS PAGE////////////
@@ -699,31 +868,31 @@ const loadMoreAddress = async (req, res, next) => {
 
 // Route to handle address deletion
 const deleteAddress = async (req, res) => {
- 
-        const userId = req.session.user_id;
-        const addressIndexToDelete = req.query.index;
-        try {
-          const user = await User.findById({_id:userId});
-      
-          if (!user) {
+
+    const userId = req.session.user_id;
+    const addressIndexToDelete = req.query.index;
+    try {
+        const user = await User.findById({ _id: userId });
+
+        if (!user) {
             return res.status(404).send('User not found');
-          }
-          if (addressIndexToDelete >= 0 && addressIndexToDelete < user.address.length) {
+        }
+        if (addressIndexToDelete >= 0 && addressIndexToDelete < user.address.length) {
             await User.updateOne(
                 { _id: userId },
                 { $pull: { address: { _id: user.address[addressIndexToDelete]._id } } }
-              );
-      
-            return res.redirect('/selectAddress'); 
-          } else {
+            );
+
+            return res.redirect('/selectAddress');
+        } else {
             return res.status(404).send('Address not found');
-          }
-        } catch (err) {
-          console.error(err);
-          return res.status(500).send('Internal Server Error');
         }
-      };
-  
+    } catch (err) {
+        console.error(err);
+        return res.status(500).send('Internal Server Error');
+    }
+};
+
 
 
 
@@ -731,7 +900,18 @@ const deleteAddress = async (req, res) => {
 
 const userProfile = async (req, res, next) => {
     try {
-        const session = req.session.user_id
+        const session = req.session.user_id;
+        let counter;
+
+        if (session) {
+            const user = await User.findOne({ _id: session });
+            counter = await cartSchema.aggregate([
+                { $match: { userId: user._id } },
+                { $unwind: "$item" },
+                { $group: { _id: null, total: { $sum: "$item.quantity" } } },
+                { $project: { _id: 0 } }
+            ]);
+        }
         if (session) {
             const userData = await User.findOne({ _id: new Object(session) })
             if (orderStatus == 1) {
@@ -771,7 +951,7 @@ const userProfile = async (req, res, next) => {
                 orderStatus = 0
             }
             const orders = await orderSchema.find({ $and: [{ userId: session }, { user_cancelled: false }, { admin_cancelled: false }, { is_delivered: false }] }).populate('item.product')
-            res.render('userProfile', { userData, session, message, orders, msg })
+            res.render('userProfile', { userData, session, message, orders, msg, counter: counter ? counter[0]?.total || 0 : 0 })
             msg = null
             message = null
         } else {
@@ -898,7 +1078,7 @@ const changePswd = async (req, res, next) => {
             } else {
                 if (newPassword == rePassword) {
                     console.log("entered")
-                    
+
                     const passwordSec = await securePassword(newPassword)
                     console.log(passwordSec);
                     await User.updateOne({ _id: new Object(id) }, { $set: { password: passwordSec } })
@@ -921,23 +1101,220 @@ const changePswd = async (req, res, next) => {
 }
 
 
-const orderConfirm = async (req, res, next) => {
 
+// const orderConfirm = async (req, res, next) => {
+
+//     try {
+//         let payMoney
+//         const session = req.session.user_id
+//         const payment = req.body
+//         paymentMethod = payment.flexRadioDefault
+//         let offer
+//         let maxDiscount = 0;
+//         let dis;
+//         //const cart = await cartSchema.findOne({ userId: session })
+//         const user = await User.findOne({ _id: session })
+
+//         const cart = await cartSchema
+//             .findOne({ userId: session })
+//             .populate({
+//                 path: 'item.product',
+//                 populate: {
+//                     path: 'category',
+//                     model: 'category' // Assuming 'category' is the model name for the category schema
+//                 }
+//             });
+
+//         for (const item of cart.item) {
+//             const categoryId = item.product.category._id; // Assuming '_id' is the ID field of the category
+
+//             // Check if there is an offer for the category
+//             offer = await offerSchema.findOne({ category: categoryId });
+
+//             if (offer) {
+//                 maxDiscount = offer.maxDiscount;
+//                 console.log(`Category ${categoryId} has a maximum discount of ${maxDiscount}`);
+//                 // Perform further operations with the maxDiscount value or the offer data
+//                     payMoney = parseInt(cart.totalPrice) - maxDiscount
+
+//         }
+//     }
+
+//         if (cart.couponDiscount) {
+//             payMoney = parseInt(cart.totalPrice) - cart.couponDiscount
+//         } else {
+//             payMoney = parseInt(cart.totalPrice)
+//         }
+
+
+
+
+
+//         req.session.payMoney = payMoney
+//         if (payment.flexRadioDefault == 'cashOn') {
+//             if (user.wallet) {
+//                 if (user.wallet >= payMoney) {
+//                     await User.findByIdAndUpdate({ _id: session }, { $inc: { wallet: -payMoney } })
+//                 } else {
+//                     await User.findByIdAndUpdate({ _id: session }, { $set: { wallet: 0 } })
+//                 }
+//             }
+//             orderStatus = 1
+//             res.redirect('/userProfile')
+//             message = 'Your order started shipping'
+//         } else if (payment.flexRadioDefault == 'Wallet') {
+//             if (user.wallet) {
+//                 if (user.wallet >= payMoney) {
+//                     await User.findByIdAndUpdate({ _id: session }, { $inc: { wallet: -payMoney } })
+//                 } else {
+//                     await User.findByIdAndUpdate({ _id: session }, { $set: { wallet: 0 } })
+//                 }
+//             }
+//             orderStatus = 1
+//             res.redirect('/userProfile')
+//             message = 'Your order started shipping'
+//         } else if (payment.flexRadioDefault == 'online') {
+//             if (user.wallet) {
+//                 payMoney = payMoney - user.wallet
+//             }
+//             const currencyMap = {
+//                 840: "USD",
+//                 978: "EUR",
+//                 826: "GBP",
+//             };
+//             const currencyCode = currencyMap["840"];
+
+//             const amount = {
+//                 currency: currencyCode,
+//                 total: payMoney,
+//             };
+
+
+//             const create_payment_json = {
+//                 intent: "sale",
+//                 payer: {
+//                     payment_method: "paypal",
+//                 },
+//                 redirect_urls: {
+//                     return_url: process.env.SITE_URL + "/success",
+//                     cancel_url: process.env.SITE_URL + "/checkout",
+//                 },
+//                 transactions: [
+//                     {
+//                         amount,
+//                         description: "Washing Bar soap",
+//                     },
+//                 ],
+//             };
+
+//             paypal.payment.create(create_payment_json, function (error, payment) {
+//                 if (error) {
+//                     throw error;
+//                 } else {
+//                     for (let i = 0; i < payment.links.length; i++) {
+//                         if (payment.links[i].rel === "approval_url") {
+//                             res.redirect(payment.links[i].href);
+//                         }
+//                     }
+//                 }
+//             });
+
+//         } else {
+//             res.redirect('/placeOrder')
+//             msg = 'Please select any payment option'
+//         }
+//     } catch (error) {
+//         console.log(error);
+//         next(error.message)
+//     }
+
+// }
+
+
+const orderConfirm = async (req, res, next) => {
     try {
-        const session = req.session.user_id
-        const payment = req.body
-        paymentMethod = payment.flexRadioDefault
-        const cart = await cartSchema.findOne({ userId: session })
-        const user = await User.findOne({ _id: session })
-        let payMoney = parseInt(cart.totalPrice)
-    
-        req.session.payMoney = payMoney
+        let payMoney;
+        const session = req.session.user_id;
+        const payment = req.body;
+        paymentMethod = payment.flexRadioDefault;
+        let offerApplied = false;
+        let maxDiscount = 0;
+
+        const user = await User.findOne({ _id: session });
+        const cart = await cartSchema
+            .findOne({ userId: session })
+            .populate({
+                path: 'item.product',
+                populate: {
+                    path: 'category',
+                    model: 'category'
+                }
+            });
+
+        for (const item of cart.item) {
+            const categoryId = item.product.category._id;
+
+
+            const offer = await offerSchema.findOne({ category: categoryId });
+
+            if (offer && offer.maxDiscount > maxDiscount && cart.totalPrice >= offer.minPurchase) {
+                maxDiscount = offer.maxDiscount;
+                offerApplied = true;
+                console.log(`Category ${categoryId} has a maximum discount of ${maxDiscount}`);
+            }
+        }
+
+        if (offerApplied) {
+            payMoney = parseInt(cart.totalPrice) - maxDiscount;
+            console.log(payMoney);
+            console.log("Success - Category offer applied");
+        } else if (cart.couponDiscount) {
+            payMoney = parseInt(cart.totalPrice) - cart.couponDiscount;
+            console.log("Coupon applied");
+        } else {
+            payMoney = parseInt(cart.totalPrice);
+            console.log("No discount applied");
+        }
+
+        req.session.payMoney = payMoney;
+
         if (payment.flexRadioDefault == 'cashOn') {
+            // if (user.wallet) {
+            //     if (user.wallet >= payMoney) {
+            //         await User.findByIdAndUpdate({ _id: session }, { $inc: { wallet: -payMoney } })
+            //     } else {
+            //         await User.findByIdAndUpdate({ _id: session }, { $set: { wallet: 0 } })
+            //     }
+            // }
             orderStatus = 1
             res.redirect('/userProfile')
             message = 'Your order started shipping'
-        } else if (payment.flexRadioDefault == 'online') {
+        } else if (payment.flexRadioDefault == 'Wallet') {
+            console.log("entered");
+            // if (!user.wallet) {
+            //     msg = 'Insufficient Balance';
+            // }
+            console.log("yes");
+            if (user.wallet) {
+                console.log("true");
+                if (user.wallet >= payMoney) {
+                    console.log("deducted");
+                    await User.findByIdAndUpdate({ _id: session }, { $inc: { wallet: -payMoney } });
+                    console.log("updated");
+                    orderStatus = 1;
+                    res.redirect('/userProfile');
+                    message = 'Your order started shipping';
+                } else {
+                    console.log("not deducted");
+                    res.redirect("/placeOrder?showAlert=true")
 
+                }
+            }
+
+        } else if (payment.flexRadioDefault == 'online') {
+            // if (user.wallet) {
+            //     payMoney = payMoney - user.wallet
+            // }
             const currencyMap = {
                 840: "USD",
                 978: "EUR",
@@ -970,8 +1347,6 @@ const orderConfirm = async (req, res, next) => {
 
             paypal.payment.create(create_payment_json, function (error, payment) {
                 if (error) {
-
-
                     throw error;
                 } else {
                     for (let i = 0; i < payment.links.length; i++) {
@@ -981,16 +1356,17 @@ const orderConfirm = async (req, res, next) => {
                     }
                 }
             });
+
         } else {
-            res.redirect('/placeOrder')
-            msg = 'Please select any payment option'
+            res.redirect('/placeOrder?showAlert=false')
+
         }
     } catch (error) {
         console.log(error);
-        next(error.message)
+        next(error.message);
     }
+};
 
-}
 
 
 //CONFIRM PAYMENT
@@ -1002,7 +1378,7 @@ const confirmPayment = async (req, res, next) => {
     const session = req.session.user_id
     const cart = await cartSchema.findOne({ userId: session })
     //const user = await User.findOne({ _id: session })
- 
+
     const execute_payment_json = {
         payer_id: payerId,
         transactions: [
@@ -1097,6 +1473,14 @@ const cancelOrder = async (req, res, next) => {
         const orders = await orderSchema.findOne({ _id: orderId }).populate('item.product')
         const user = await User.findOne({ _id: session })
         await orderSchema.updateOne({ _id: orderId }, { $set: { user_cancelled: true } })
+        if (orders.paymentType == 'online' || orders.paymentType == 'Wallet') {
+            if (user.wallet) {
+                await User.findByIdAndUpdate({ _id: session }, { $inc: { wallet: orders.totalPrice } })
+            } else {
+                await User.findByIdAndUpdate({ _id: session }, { $set: { wallet: orders.totalPrice } })
+            }
+        }
+
         orders.item.forEach(async (item) => {
             const productId = item.product._id
             const quantity = item.quantity
@@ -1147,7 +1531,63 @@ const returnOrder = async (req, res, next) => {
 }
 
 
+const addCoupon = async (req, res, next) => {
+    try {
+        let amount
+        const code = req.body.coupon
+        const session = req.session.user_id
+        const cart = await cartSchema.findOne({ userId: session }, { totalPrice: 1 })
+        const coupon = await couponSchema.findOne({ couponCode: code })
 
+        if (coupon) {
+            if (cart.totalPrice > coupon.minPurchase) {
+                const today = new Date()
+
+                if (coupon.endDate > today) {
+                    const userFind = await couponSchema.findOne({ couponCode: code, userId: session })
+                    if (!userFind) {
+
+
+                        const discountPrice = coupon.maxDiscount
+                        console.log(discountPrice)
+                        amount = parseInt(cart.totalPrice) - discountPrice
+                        await cartSchema.updateOne({ userId: session }, { $set: { couponDiscount: discountPrice } })
+                        await couponSchema.updateOne({ couponCode: code }, { $push: { userId: session } })
+                        res.json({ status: true, discountPrice, amount })
+                    } else {
+                        res.json({ used: true })
+                    }
+                } else {
+                    res.json({ expired: true })
+                }
+            } else {
+
+                res.json({ lessPrice: true })
+            }
+        } else {
+            res.json({ noMatch: true })
+        }
+
+
+    } catch (error) {
+        console.log(error.message);
+        next(error.message)
+    }
+}
+
+const removeCoupon = async (req, res, next) => {
+    try {
+        const session = req.session.user_id;
+        await cartSchema.updateOne({ userId: session }, { $set: { couponDiscount: 0 } })
+        const coo = await couponSchema.findOne({ userId: session }, { _id: 1 })
+        await couponSchema.updateOne({ _id: coo }, { $pull: { userId: session } })
+        res.json({ success: true });
+    } catch (error) {
+        console.log(error.message);
+        next(error.message)
+    }
+
+}
 
 module.exports = {
     userSignup,
@@ -1171,6 +1611,7 @@ module.exports = {
     addAddress,
     addNewAddress,
     loadChekOut,
+    addCoupon,
     loadSelectAddress,
     loadMoreAddress,
     deleteAddress,
@@ -1186,5 +1627,5 @@ module.exports = {
     cancelOrder,
     returnOrder,
     sendResend,
-
+    removeCoupon,
 }

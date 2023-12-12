@@ -21,8 +21,8 @@ app.set('views','./views/users')
 app.use(session({ secret:process.env.KEY , cookie: { maxAge: 60000 * 100 }, saveUninitialized: true, resave: true }))
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.json({limit:'10mb'}))
+app.use(bodyParser.urlencoded({ extended: true ,limit:'10mb'}))
 app.use('/', userRout)
 app.use('/admin', adminRout)
 

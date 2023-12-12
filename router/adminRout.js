@@ -67,12 +67,36 @@ admin_rout.post('/editCategory',auth.logOutSession,categoryController.editCatego
 
 admin_rout.get('/deleteCategory',auth.logOutSession,categoryController.categoryDelete)
 
+admin_rout.get('/showCategory',auth.logOutSession,categoryController.categoryDelete)
+
 admin_rout.post('/proImage',auth.logOutSession,productController.singleRemove)
 
 admin_rout.get('/salesReport',auth.logOutSession,adminController.loadSalesPage)
 
+admin_rout.get('/coupon',auth.logOutSession,adminController.loadCoupons)
+
+admin_rout.get('/addCoupon',auth.logOutSession,adminController.loadAddCoupon)
+
+admin_rout.post('/addCoupon',auth.logOutSession,adminController.addCoupon)
+
+admin_rout.get('/editCoupon',auth.logOutSession,adminController.loadEditCoupon)
+
+admin_rout.post('/editCoupon',auth.logOutSession,adminController.editCoupon)
+
+admin_rout.get('/deleteCoupon',auth.logOutSession,adminController.deleteCoupon)
 
 
+admin_rout.get('/offer',auth.logOutSession,adminController.loadCat)
+
+admin_rout.get('/addOffer',auth.logOutSession,adminController.loadAddOffer)
+
+admin_rout.post('/addOffer',auth.logOutSession,adminController.addOffer)
+
+admin_rout.get('/editOffer',auth.logOutSession,adminController.loadEditOffer)
+
+admin_rout.post('/editOffer',auth.logOutSession,adminController.editOffer)
+
+admin_rout.get('/deleteOffer',auth.logOutSession,adminController.deleteOffer)
 
 
 admin_rout.get("*",auth.logOutSession,adminController.loadAdminHome)

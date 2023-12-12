@@ -1,8 +1,10 @@
 const userSchema = require('../models/userModel')
-// const categorySchema = require('../models/categoryModel')
+ const categorySchema = require('../models/categoryModel')
 // const productSchema = require('../models/productModel')
 const salesSchema=require('../models/salesReport')
 const orderSchema=require('../models/orderModel')
+const couponSchema=require('../models/couponModel')
+const offerSchema=require('../models/offerModel')
 const nodemailer = require('nodemailer')
 const moment = require('moment');
 const bcrypt = require('bcrypt')
@@ -319,9 +321,206 @@ const unblockUser = async (req, res) => {
     }
 }
 
+const loadCoupons = async (req, res) => {
+    try {
+        const coupons = await couponSchema.find()
+        res.render('coupons', { msg, message, coupons })
+        msg = null
+        message = null
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const loadAddCoupon = async (req, res) => {
+    try {
+        res.render('addCoupon', { msg, message })
+        msg = null
+        message = null
+    } catch (error) {
+        console.log(error.message);
+    }
+}
 
 
 
+const addCoupon = async (req, res) => {
+    try {
+        const coupon = req.body
+
+        const newCoupon = new couponSchema({
+            couponName: coupon.Name,
+            couponCode: coupon.Code,
+            startDate: coupon.StartDate,
+            endDate: coupon.endDate,
+            maxDiscount: coupon.maxDiscount,
+            minPurchase: coupon.minPurchase
+        })
+        await newCoupon.save()
+        res.redirect('/admin/coupon')
+        message = 'Coupon added successfully'
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const loadEditCoupon = async (req, res) => {
+    try {
+        const id = req.query.id
+        const coupon = await couponSchema.findOne({ _id: id })
+        res.render('editCoupon', { coupon, msg })
+        msg = null
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+
+/////////////// EDIT COUPON/////////////
+
+const editCoupon = async (req, res) => {
+    try {
+        const coupon = req.body
+        const id = req.query.id
+
+        await couponSchema.updateOne({ _id: id }, { $set: { couponName: coupon.Name, couponCode: coupon.Code, startDate: coupon.StartDate, endDate: coupon.endDate, maxDiscount: coupon.maxDiscount, minPurchase: coupon.minPurchase } })
+        res.redirect("/admin/coupon")
+        message = 'Coupon edited successfully'
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+
+///////////////DELETE COUPON////////////
+
+const deleteCoupon = async (req, res) => {
+    try {
+        const id = req.query.id
+
+        await couponSchema.deleteOne({ _id: id })
+        res.redirect('/admin/coupon')
+        message = 'Coupon deleted successfully'
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const loadCat = async (req, res) => {
+    try {
+        const offers = await offerSchema.find().populate('category');
+        res.render('offer', { msg, message, offers:offers })
+        msg = null
+        message = null
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const loadAddOffer = async (req, res) => {
+    try {
+        const category = await categorySchema.find()
+        res.render('addOffer', { msg, message,category })
+        msg = null
+        message = null
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const addOffer = async (req, res) => {
+    try {
+        const { categoryId, maxDiscount,minPurchase} = req.body; // Assuming categoryId is sent from the form
+
+        // Fetch the category from the database using the provided categoryId
+        const existingOffer = await offerSchema.findOne({ category: categoryId });
+
+        if (existingOffer) {
+            // If an offer already exists for this category, handle accordingly
+            return res.status(400).send('An offer already exists for this category');
+        }
+        const newOffer = new offerSchema({
+            category: categoryId, // Reference to the existing category object
+            maxDiscount: maxDiscount,
+            status: true,
+            minPurchase:minPurchase
+            // Other offer properties if needed
+        });
+
+        await newOffer.save();
+        res.redirect('/admin/Offer');
+        message = 'Offer added successfully';
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send('An error occurred while adding the offer');
+    }
+};
+
+
+const loadEditOffer = async (req, res) => {
+    try {
+        const id = req.query.id
+        const offer = await offerSchema.findOne({ _id: id })
+        const categories = await categorySchema.find()
+        
+        res.render('editOffer', {offer, msg,categories })
+        msg = null
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const editOffer = async (req, res) => {
+    try {
+        const { id } = req.query;
+        const { categoryId, maxDiscount,minPurchase } = req.body;
+
+        // Fetch the offer from the database using the provided ID
+        const existingOffer = await offerSchema.findById(id);
+
+        if (!existingOffer) {
+            return res.status(404).send('Offer not found');
+        }
+        const categoryHasOffer = await offerSchema.exists({ category: categoryId });
+
+        // Fetch the current category associated with the offer
+        const currentCategory = await categorySchema.findById(existingOffer.category);
+
+        if (categoryHasOffer && currentCategory._id.toString() !== categoryId) {
+            const referer = req.headers.referer || "/";
+            res.redirect(referer);
+            msg='Category already has an offer. Cannot apply offer to this category.';
+             
+        }else{
+
+        // Update the offer properties
+        existingOffer.category = categoryId;
+        existingOffer.maxDiscount = maxDiscount;
+        existingOffer.minPurchase=minPurchase;
+
+        // Save the updated offer
+        await existingOffer.save();
+
+        res.redirect('/admin/Offer'); // Redirect to the offer management page
+        message='Successfully Edited'
+        }
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send('An error occurred while updating the offer');
+    }
+};
+
+const deleteOffer = async (req, res) => {
+    try {
+        const id = req.query.id
+
+        await offerSchema.deleteOne({ _id: id })
+        res.redirect('/admin/offer')
+        message = 'Offer deleted successfully'
+    } catch (error) {
+        console.log(error.message);
+    }
+}
 
 module.exports = {
     loginLoad,
@@ -332,6 +531,17 @@ module.exports = {
     loadUserData,
     blockUser,
     unblockUser,
-   
+    loadCoupons,
+    loadAddCoupon,
+    addCoupon,
+    loadEditCoupon,
+    editCoupon,
+    deleteCoupon,
+    loadCat,
+    loadAddOffer,
+    addOffer,
+    loadEditOffer,
+    editOffer,
+    deleteOffer,
    
 }

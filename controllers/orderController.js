@@ -4,6 +4,7 @@ const cartSchema = require('../models/cartModel')
 const orderSchema = require('../models/orderModel')
 const salesSchema=require('../models/salesReport')
 const couponSchema = require('../models/couponModel')
+const offerSchema=require('../models/offerModel')
 const path = require('path');
 require('dotenv').config();
 
@@ -29,19 +30,78 @@ const loadPlaceOrder = async (req, res, next) => {
     try {
         const session = req.session.user_id
         let Total
+        let offer
+        let maxDiscount=0;
         const pro = await cartSchema.findOne({ userId: session }, { _id: 0 })
+        const user = await User.findOne({ _id: session })
+         const amo=req.body.amount
+         console.log(amo);
+         const cart = await cartSchema
+        .findOne({ userId: session })
+        .populate({
+            path: 'item.product',
+            populate: {
+                path: 'category',
+                model: 'category' // Assuming 'category' is the model name for the category schema
+            }
+        });
+       
+for (const item of cart.item) {
+  const categoryId = item.product.category._id; // Assuming '_id' is the ID field of the category
 
-        Total = parseInt(pro.totalPrice)
+  // Check if there is an offer for the category
+ offer = await offerSchema.findOne({ category: categoryId });
 
-        res.render('placeOrder', { Total, session, msg, pro })
+
+  if (offer && pro.totalPrice>=offer.minPurchase) {
+    maxDiscount = offer.maxDiscount;
+    console.log(`Category ${categoryId} has a maximum discount of ${maxDiscount}`);
+    // Perform further operations with the maxDiscount value or the offer data
+  }
+} 
+const dis=maxDiscount
+        const wallet = user.wallet
+        let walletPay = false
+        if (pro.couponDiscount) {
+            Total = parseInt(pro.totalPrice) -pro.couponDiscount
+            // if (user.wallet) {
+            //     if (user.wallet >= Total) {
+            //         walletPay = true
+            //         Total = 0
+            //     } else {
+            //         Total = Total - user.wallet
+            //     }
+            // }
+
+        } else if(offer && pro.totalPrice>=offer.minPurchase) {
+            Total = parseInt(pro.totalPrice) - dis
+            // if (user.wallet) {
+            //     if (user.wallet >= Total) {
+            //         walletPay = true
+            //         Total = 0
+            //     } else {
+            //         Total = Total - user.wallet
+            //     }
+            // }
+        }else{
+            Total = parseInt(pro.totalPrice)
+            // if (user.wallet) {
+            //     if (user.wallet >= Total) {
+            //         walletPay = true
+            //         Total = 0
+            //     } else {
+            //         Total = Total - user.wallet
+            //     }
+            // }
+
+        }
+        res.render('placeOrder', { Total, session, msg, pro, wallet, walletPay })
         msg = null
     } catch (error) {
-        console.log(error.message);
+        console.log(error.mesage);
         next(error.message)
     }
 }
-
-
 ////////////CANCEL ORDER/////////
 
 const cancelOrder = async (req, res) => {

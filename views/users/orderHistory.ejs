@@ -17,8 +17,9 @@
             </tr>
         </thead>
 <%if(orders){%>
+
     <tbody>
-        <%orders.forEach(order => {%>
+        <%orders.reverse().forEach(order => {%>
             <tr scope="row">
                 <td>
                     <%= order.start_date %>

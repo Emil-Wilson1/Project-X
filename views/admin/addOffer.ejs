@@ -1,0 +1,203 @@
+<%- include('../layouts/header.ejs') %>
+
+<style>
+    html, body {
+    height: 100%;
+    margin: 0;
+  }
+  
+  #wrapper {
+    display: flex;
+  }
+  
+  #sidebar-wrapper {
+    min-height: 100vh; /* Set the minimum height of the sidebar to the viewport height */
+   width: 200px;
+  }
+  
+  /* Additional styling for other elements */
+  /* Adjust as needed */
+  #page-content-wrapper {
+    flex: 1;
+    padding: 20px; /* Example padding */
+  }
+  
+  </style>
+<body id="reportsPage">
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="bg-dark border-right" id="sidebar-wrapper">
+            <div class="sidebar-heading">
+                <h1 class="tm-site-title mb-0 font">
+                    <span class="text-1000 text-white fs-1 mt-3 fw-bold ms-2">FINITO</span>
+                </h1>
+            </div>
+            <div class="list-group list-group-flush">
+                <!-- Sidebar items -->
+                <a href="/admin/home" class="list-group-item list-group-item-action bg-dark text-white">
+                    Dashboard
+                </a>
+                <a href="/admin/userData" class="list-group-item list-group-item-action bg-dark text-white">
+                    UserData
+                </a>
+                <a href="/admin/addProduct" class="list-group-item list-group-item-action bg-dark text-white">
+                    Add Product
+                </a>
+                <a href="/admin/products" class="list-group-item list-group-item-action bg-dark text-white">
+                    Products
+                </a>
+                <a href="/admin/category" class="list-group-item list-group-item-action bg-dark text-white">
+                    Category
+                </a>
+                <a href="/admin/order" class="list-group-item list-group-item-action bg-dark text-white">
+                    Order
+                </a>
+                <a href="/admin/coupon" class="list-group-item list-group-item-action bg-dark text-white">
+                    Coupon
+                </a>
+                <a href="/admin/offer" class="list-group-item list-group-item-action sidebar-link active text-white">Offer</a>
+            </div>
+            <!-- Additional sidebar items -->
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <!-- Your existing content -->
+                <!-- ... -->
+                <div id="page-content-wrapper">
+                    <div class="container-fluid">
+                        <div class="container tm-mt-big tm-mb-big">
+                            <div class="row">
+                                <div class="col-xl-9 col-lg-10 col-md-12 col-sm-12 mx-auto ">
+                                    <div class="tm-bg-primary-dark tm-block tm-block-h-auto">
+                                        <form action="/admin/addOffer" method="post" id="addproform" class="tm-edit-product-form">
+                                            <div class="row tm-edit-product-row">
+                                                <div class="col-xl-12 col-lg-12 col-md-12">
+                                                    <div class="form-group mb-3 text-white">
+                                                        <label for="categorySelect">Select Category:</label>
+                                       
+              
+                                                        <select name="categoryId" class="custom-select tm-select-accounts" id="category">
+                                                          <option value="" selected>Select Category</option>
+                                                          <% if(category.length > 0) {
+                                                              category.forEach(cat => { %>
+                                                                  <option value="<%= cat._id %>"><%= cat.category %></option>
+                                                              <% });
+                                                          } %>
+                                                      </select>
+                                                      <small class="error-message" id="maxDiscount-error"></small>
+                                                     </div>
+                                                  
+                                                
+                                                      <div class="form-group mb-3 text-white">
+                                                        <h6>Max Discount</h6>
+                                                        <input name="maxDiscount" type="float" id="maxDiscount" class="form-control" />
+                                                      </div>
+                                                     
+                                                      <div class="form-group mb-3 text-white">
+                                                        <h6>Min Purchase</h6>
+                                                        <input name="minPurchase" type="float" id="minPurchase" class="form-control" />
+                                                      </div>
+                                                    
+                                                      
+                                                    <!-- Other input fields for Coupon Code, Start Date, End Date, Max Discount, Min Purchase -->
+                                                    <!-- ... -->
+                                                    <div class="col-6 mb-4">
+                                                        <button type="submit" class="btn btn-dark">Add Offer</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <h6 class="text-warning bd-highlight font-weight-bold txt-style" id="error-container"></h6>
+                                        </form>
+                                        <% if (msg) { %>
+                                            <script>
+                                                // Display error message if any
+                                            </script>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        <!-- /#page-content-wrapper -->
+    </div>
+   
+</body>
+
+
+     
+
+    <%if(message){ %>
+      <script>
+        new Swal({
+          title: "Success",
+          text: "<%=message%>",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 2000
+        });
+      </script>
+
+      <%}%>
+
+
+
+      <script>
+const form = document.getElementById('addproform');
+const categoryInput = document.getElementById('category');
+const maxDiscountInput = document.getElementById('maxDiscount');
+const minPurchaseInput = document.getElementById('minPurchase');
+
+form.addEventListener('submit', (event) => {
+  let errors = [];
+
+  if (categoryInput.value.trim() === '') {
+    errors.push('Please select category.');
+    categoryInput.classList.add('is-invalid');
+  }
+
+  if (!isNaN(parseFloat(maxDiscountInput.value)) && !isNaN(parseInt(minPurchaseInput.value))) {
+    const maxDiscount = parseFloat(maxDiscountInput.value);
+    const minPurchase = parseInt(minPurchaseInput.value);
+
+    if (maxDiscount >= minPurchase) {
+      errors.push('Maximum discount should be less than minimum purchase.');
+      maxDiscountInput.classList.add('is-invalid');
+      minPurchaseInput.classList.add('is-invalid');
+    } else {
+      maxDiscountInput.classList.remove('is-invalid');
+      minPurchaseInput.classList.remove('is-invalid');
+    }
+  }
+
+  if (maxDiscountInput.value.trim() === '') {
+    errors.push('Please enter a maximum discount.');
+    maxDiscountInput.classList.add('is-invalid');
+  } else if (isNaN(parseFloat(maxDiscountInput.value))) {
+    errors.push('Maximum discount must be a number.');
+    maxDiscountInput.classList.add('is-invalid');
+  } else {
+    maxDiscountInput.classList.remove('is-invalid');
+  }
+
+  if (minPurchaseInput.value.trim() === '') {
+    errors.push('Please enter a minimum purchase amount.');
+    minPurchaseInput.classList.add('is-invalid');
+  } else if (isNaN(parseInt(minPurchaseInput.value))) {
+    errors.push('Minimum purchase amount must be a number.');
+    minPurchaseInput.classList.add('is-invalid');
+  } else {
+    minPurchaseInput.classList.remove('is-invalid');
+  }
+
+  if (errors.length > 0) {
+    event.preventDefault();
+    const errorContainer = document.getElementById('error-container');
+    errorContainer.innerHTML =errors;
+  }
+});
+      </script>
+      <%- include('../layouts/footer.ejs') %>

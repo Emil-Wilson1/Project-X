@@ -201,9 +201,18 @@
                                     <ul class="product__hover">
                                         <li><a href="/proImage/<%=product[i].image[0]%>" class="image-popup"><span
                                                     class="arrow_expand"></span></a></li>
-                                        <li><a href="#"><span class="icon_heart_alt"></span></a></li>
-                                        <li><a href="/addToCart?id=<%=product[i]._id%>"><span class="icon_bag_alt"></span></a></li>
-                                       
+                                                    <li ><a href="/addToWishlist?id=<%=product[i]._id%>" >
+                                                        <span class="icon_heart_alt "  >
+
+                                                        </span></a></li>
+                                                    
+                                        <!-- <li><a href="/addToCart?id=<%=product[i]._id%>"><span class="icon_bag_alt"></span></a></li> -->
+                                        <li>
+                                            <a href="/addToCart?id=<%=product[i]._id%>" >
+                                              <span class="icon_bag_alt"></span>
+                                            </a>
+                                          </li>
+                                          
                                     </ul>
                                 </div>
                                 <div class="product__item__text">
@@ -284,5 +293,117 @@
       <%}%>
 
      
+
+     <!-- <script>
+
+$(document).ready(function() {
+    $('body').on('click', '#addToCartLink', function(event){
+        event.preventDefault(); // Prevent default anchor tag behavior
+        
+        const productId = $(this).data('product-id');
+
+        $.ajax({
+            url: `/addToCart?id=${productId}`,
+            method: 'GET',
+            success: function(response) {
+                if (response.success === 'Item successfully added') {
+                    // Item added to wishlist, display success message using SweetAlert
+                   new Swal({
+                        icon: 'success',
+                        title: 'Success!',
+                        showConfirmButton: false,
+                        text: 'Item added to wishlist',
+                        timer: 1000
+                    });
+                } else if (response.success === 'Item out of stock') {
+                    // Item is already in the wishlist, display alert using SweetAlert
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Warning!',
+                        text: 'Item is already in wishlist'
+                    });
+                } else {
+                    // Handle other responses or errors
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Failed to add item to wishlist'
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                // Handle AJAX errors by displaying an error message using SweetAlert
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Failed to add item to wishlist'
+                });
+                console.error('Error adding item to wishlist:', error);
+            }
+        });
+    });
+});
+
+</script> -->
+<!-- <script>
+
+
+
+$(document).ready(function() {
+    $('body').on('click', '.addWishlist', function(event){
+        event.preventDefault(); // Prevent default anchor tag behavior
+        
+        const productId = $(this).data('product-id');
+
+        $.ajax({
+            url: `/addToWishlist?id=${productId}`,
+            method: 'GET',
+            success: function(response) {
+                if (response.success === 'added') {
+                    // Item added to wishlist, display success message using SweetAlert
+                   new Swal({
+                        icon: 'success',
+                        title: 'Success!',
+                        showConfirmButton: false,
+                        text: 'Item added to wishlist',
+                        timer: 1000
+                    });
+                } else if (response.success === 'already_added') {
+                    // Item is already in the wishlist, display alert using SweetAlert
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Warning!',
+                        text: 'Item is already in wishlist'
+                    });
+                } else {
+                    // Handle other responses or errors
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Failed to add item to wishlist'
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                // Handle AJAX errors by displaying an error message using SweetAlert
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Failed to add item to wishlist'
+                });
+                console.error('Error adding item to wishlist:', error);
+            }
+        });
+    });
+});
+
+
+
+
+
+</script> -->
+
+
+
 
     <%- include('../layouts/pagesFooter.ejs') %>

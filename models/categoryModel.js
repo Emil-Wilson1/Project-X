@@ -6,6 +6,12 @@ const categorySchema = mongoose.Schema({
     },is_List:{
        type:Boolean,
        default:true 
+    }, maxDiscount: {
+        type: Number,
+        
+    }, status: {
+        type: Boolean,
+        default: false
     }
 })
 

@@ -382,7 +382,7 @@ crossorigin="anonymous"></script>
                 </div>
                 <div class="list-group list-group-flush">
                     <!-- Sidebar items -->
-                    <a href="/admin/home" class="list-group-item list-group-item-action bg-dark text-white">
+                    <a href="/admin/home" class="list-group-item list-group-item-action sidebar-link active text-white">
                         Dashboard
                     </a>
                     <a href="/admin/userData" class="list-group-item list-group-item-action bg-dark text-white">
@@ -400,6 +400,10 @@ crossorigin="anonymous"></script>
                     <a href="/admin/order" class="list-group-item list-group-item-action bg-dark text-white">
                         Order
                     </a>
+                    <a href="/admin/coupon" class="list-group-item list-group-item-action bg-dark text-white">
+                      Coupon
+                  </a>
+                  <a href="/admin/offer" class="list-group-item list-group-item-action bg-dark text-white">Offer</a>
                 </div>
                 <!-- Additional sidebar items -->
             </div>
@@ -418,8 +422,8 @@ crossorigin="anonymous"></script>
                           <h2>Order <b>Details</b></h2>
                         </div>
                         <div class="col-sm-8">
-                          <!-- <button type="button" class="btn-dark" onclick="return ExportToExcel()" ><i class="material-icons">Export to Excel</i> </button>
-                                      <button type="button" class="btn-dark" onclick="return printTable()" ><i class="material-icons">Print</i> </button> -->
+                          <!-- <button type="button" class="btn-dark" onclick="return ExportToExcel()" ><i class="material-icons">Export to Excel</i> </button> -->
+                                      <button type="button" class="btn-dark" onclick="return printTable()" ><i class="material-icons">Print</i> </button>
                         </div>
                               </div>
                           </div>
@@ -496,14 +500,7 @@ crossorigin="anonymous"></script>
    
 
 <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
-<!-- <script>
-    function ExportToExcel(type, fn, dl) {
-    var elt = document.getElementById("salesTable");
-    var wb = XLSX.utils.table_to_book(elt, { sheet: "sheet1" });
-    return dl ?
-        XLSX.write(wb, { bookType: type, bookSST: true, type: 'base64' }) :
-        XLSX.writeFile(wb, fn || ('MySheetName.' + (type || 'xlsx')));
-}
+<script>
 
 function printTable() {
     var table = document.getElementById("salesTable");
@@ -513,7 +510,7 @@ function printTable() {
     newWin.document.close();
     setTimeout(function () { newWin.close(); }, 10);
   }
-</script> -->
+</script>
 
 
     <%- include('../layouts/footer.ejs') %>

@@ -1,6 +1,43 @@
 <%- include('../layouts/headerUser.ejs') %>
 
 <style>
+  .cart-icon {
+position: relative;
+display: inline-block;
+align-items: center;
+}
+
+.icon_bag_alt {
+/* Your icon styles here */
+/* For example: */
+font-size: 24px;
+color: black;
+}
+
+
+
+.cart-counter {
+position: absolute;
+bottom: 10px;
+right: -8px;
+background-color: red;
+color: white;
+border-radius: 50%;
+padding: 5px;
+width: 20px; /* Set the width and height to create a circle */
+height: 20px; /* Same as width for a perfect circle */
+text-align: center;
+font-size: 12px;
+font-weight: bold;
+line-height: 20px; /* Center the text vertically */
+display: flex;
+justify-content: center;
+align-items: center;
+}
+
+</style>
+
+<style>
   /* Optional custom CSS for referral code box */
   .referral-code-box {
     display: inline-block;
@@ -77,8 +114,16 @@
 
                   <li><a href="/wishlist" data-bs-toggle="tooltip" data-bs-placement="top" title="Wishlist"><span
                         class="icon_heart_alt"></span></a></li>
-                  <li><a href="/cart" data-bs-toggle="tooltip" data-bs-placement="top" title="Cart"><span
-                        class="icon_bag_alt"></span></a></li>
+                        <% if(session==null){%>
+                          <li><a href="/cart" data-bs-toggle="tooltip" data-bs-placement="top" title="Cart"><span class="icon_bag_alt"></span></a></li>
+                          <% }else{%>
+                          <div class="cart-icon">
+                              <a href="/cart">
+                                <span class="icon_bag_alt"></span>
+                                <span class="cart-counter"><%= counter%></span>
+                              </a>
+                            </div>
+                            <%}%>
                 </ul>
                 <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1"
                   data-bs-toggle="dropdown"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -225,7 +270,7 @@
     </div>
   </div> -->
 
-  
+  <% if (!userData.redeemed) { %>
 <div class="container mt-4">
   <div class="row">
     <!-- Column for the EJS content -->
@@ -241,7 +286,7 @@
       <div class="referral-code-box">
         <p class="mb-0"> Your Referral Code:</p>
         <div class="input-group">
-          <input type="text" class="form-control text-dark" value="<%=userData._id%>" id="referralCodeInput" readonly>
+          <input type="text" class="form-control text-dark" value="<%=userData.referalId%>" id="referralCodeInput" readonly>
           <div class="input-group-append">
             <button class="btn btn-primary copy-button mb-4 ml-2" onclick="copyReferralCode()">Copy</button>
           </div>
@@ -251,7 +296,7 @@
   </div>
 </div>
 
-
+<%}%>
 
 
   <!-- <% if(orders.length>0){%>
@@ -321,56 +366,63 @@
           <div class="tm-bg-primary-dark tm-block tm-block-taller tm-block-scroll">
             <h3 class="tm-block-title text-center mb-5 ">Orders</h3>
             
-              <%for(let i=0;i<orders.length;i++){ %>
-                <table class="table  text-center table-secondary">
-                  <thead>
-                    <tr class="table-dark">
-                      <th scope="col">Product</th>
-                      <th scope="col">quantity</th>
-                      <th scope="col">price</th>
-                      <th scope="col">Status</th>
-                      <th scope="col">Payment</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <%for(let j=0;j<orders[i].item.length;j++){%>
-                      <tr scope="row" class="">
-                        <td>
-                          <%=orders[i].item[j].product.title%>
-                        </td>
-                        <td>
-                          <%=orders[i].item[j].quantity%>
-                        </td>
-    
-                        <td>
-                            <%=orders[i].item[j].quantity*orders[i].item[j].price%>
-                        </td>
-                        <% }%>
-                          <%if(orders[i].is_delivered==false){ %>
+            <%for(let i=0;i<orders.length;i++){ %>
+              <table class="table  text-center table-secondary">
+                <thead>
+                  <tr class="table-dark">
+                    <th scope="col">Product</th>
+                    <th scope="col">quantity</th>
+                    <!-- <th scope="col">price</th> -->
+                    <th scope="col">Total price</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Payment</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <%for(let j=0;j<orders[i].item.length;j++){%>
+                    <tr scope="row" class="">
+                      <td>
+                        <%=orders[i].item[j].product.title%>
+                      </td>
+                      <td>
+                        <%=orders[i].item[j].quantity%>
+                      </td>
+
+                      
+<!--   
+                      <td>
+                          <%=orders[i].item[j].quantity*orders[i].item[j].price%>
+                      </td> -->
+                      <% }%>
+                      <td>
+                        <%=orders[i].totalPrice%>
+                      </td>
+                        <%if(orders[i].is_delivered==false){ %>
+                          <td>
+                            On the way
+                          </td>
+                          <%}else{%>
                             <td>
-                              On the way
+                              delivered
                             </td>
-                            <%}else{%>
-                              <td>
-                                delivered
-                              </td>
-                              <%}%>
-                              <td>
-                                <%=orders[i].paymentType%>
-                              </td>
-                            
-                      </tr>
-                  </tbody>
-                </table>
-                <a href="/cancelOrder?orderid=<%=orders[i]._id%>" class="btn btn-danger">Cancel order</a>
-                <a href="/orders?orderid=<%=orders[i]._id%>" class="btn btn-primary">Order detalils</a>
-                <%}%>
-          </div>
-          
+                            <%}%>
+                            <td>
+                              <%=orders[i].paymentType%>
+                            </td>
+                          
+                    </tr>
+                </tbody>
+              </table>
+              <a href="/cancelOrder?orderid=<%=orders[i]._id%>" class="btn btn-danger">Cancel order</a>
+              <a href="/orders?orderid=<%=orders[i]._id%>" class="btn btn-primary">order detalils</a>
+              <%}%>
         </div>
-       
-        </div>
-        <%}%>
+        
+      </div>
+     
+      </div>
+      <%}%>
+      
 
 
       <%if(message!=null){%>

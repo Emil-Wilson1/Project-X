@@ -6,7 +6,7 @@ require('dotenv').config();
 const fs = require('fs');
 const { ObjectId } = require('mongodb');
 const { query } = require('express')
-const imagesDir=path.join(__dirname,'..','public','proImage','temp')
+// let imageSrc=path.join(__dirname,'..','public','proImage','temp')
 let msg
 let message
 // SHOW PRODUCTS
@@ -149,6 +149,14 @@ const addProduct = async (req, res) => {
         console.log(error);
     }
 }
+
+
+
+
+
+
+
+
 // EDIT PRODUCTS
 
 const editProduct = async (req, res) => {
@@ -156,6 +164,7 @@ const editProduct = async (req, res) => {
         const prod = req.body
         const id = req.query.id
         const catId = await categorySchema.findOne({ category: prod.category,is_List:true})
+        console.log(catId);
         if (prod.title.trim().length == 0 || prod.price.trim().length == 0 || prod.stocks.trim().length == 0 || prod.category.length == 0 || prod.brand.trim().length == 0 || prod.description.trim().length == 0) {
             msg = 'Full field should be filled'
             res.redirect('/admin/products')
@@ -253,4 +262,5 @@ module.exports={
     loadEditPage,
     editProduct,
     singleRemove,
+
 }

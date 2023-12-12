@@ -7,7 +7,27 @@
                         <span><b> Payment Method</b></span>
                         <div class="card mt-3">
                             <div class="accordion" id="accordionExample">
-                             
+                                <%if(wallet){%>
+                                    <div class="card" style="justify-content: space-between;">
+                                    <div class="card-header p-0" id="">
+                                        <h2 class="mb-0">
+                                            <button
+                                                class="btn btn-light btn-block text-left  p-3 rounded-0 border-bottom-custom"
+                                                type="button" data-toggle="collapse" data-target="#collapseTwo"
+                                                aria-expanded="false" aria-controls="collapseTwo">
+                                                <div class="d-flex justify-content-between ms-2">
+                                                    <input class="form-check-input" type="radio" value="Wallet"
+                                                        name="flexRadioDefault" id="flexRadioDefault1">
+                                                    <label class="form-check-label" for="flexRadioDefault1"><br><span>
+                                                            Wallet</span>
+                                                    </label>
+                                                </div>
+                                            </button>
+                                        </h2>
+                                    </div>
+                                </div>
+                            
+                                    <%}%>
                                     <div class="card" style="justify-content: space-between;">
                                     <div class="card-header p-0" id="">
                                         <h2 class="mb-0">
@@ -46,7 +66,7 @@
                                         </h2>
                                     </div>
                                 </div>
-                                   
+                                  
                                
                             </div>
                         </div>
@@ -67,7 +87,16 @@
                                 </div>
                             </div>
                             <hr class="mt-0 line">
-                          
+                            <div class="d-flex justify-content-between p-3">
+                                <div class="d-flex flex-column">
+                                    <span>Wallet Amount</span>
+                                </div>
+                                <div class="mt-1">
+                                    <h6>Rs <b>
+                                            <%=wallet%>
+                                        </b></h6>
+                                </div>
+                            </div>
                             <hr class="mt-0 line">
                             <div class="d-flex justify-content-between p-3">
                                 <div class="d-flex flex-column">
@@ -100,6 +129,31 @@
             });
         </script>
         <%}%>
-      
+        <script>
+            // Get the query parameter function
+            const getQueryParam = (name) => {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(name);
+            };
+        
+            // Check if showAlert parameter is present and show SweetAlert
+            document.addEventListener('DOMContentLoaded', () => {
+                const showAlert = getQueryParam('showAlert');
+        
+                if (showAlert === 'true') {
+                    Swal.fire({
+                        title: 'Insufficient Balance!',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+                }else if(showAlert=='false'){
+                    Swal.fire({
+                        title: 'Please Select Any Payment Option!',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    })
+                }
+            });
+        </script>
         
             <%- include('../layouts/pagesFooter.ejs') %>

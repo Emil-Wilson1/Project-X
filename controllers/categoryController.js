@@ -89,28 +89,49 @@ const categoryManage = async (req, res) => {
 
 
 const categoryDelete = async (req, res) => {
-    try {
-        const delCat = req.query.id;
-        const product = await productSchema.findOne({ category: delCat });
-        const category = await categorySchema.findOne({ _id: delCat });
+    // try {
+    //     // const delCat = req.query.id;
+    //     // const product = await productSchema.findOne({ category: delCat });
+    //     // const category = await categorySchema.findOne({ _id: delCat });
 
-        if (product) {
-            res.redirect('/admin/Category');
-            msg = 'Category used in product';
+    //     // // if (product) {
+    //     // //     res.redirect('/admin/Category');
+    //     // //     msg = 'Category used in product';
+    //     // // } else {
+    //     //     if (category && category.is_List == true) {
+    //     //         await categorySchema.updateOne({ _id: delCat }, { $set: { is_List: false } });
+    //     //         res.redirect('/admin/Category');
+    //     //         message = 'Category Unlisted successfully';
+    //     //     } else if (category && category.is_List == false) {
+    //     //         await categorySchema.updateOne({ _id: delCat }, { $set: { is_List: true } });
+    //     //         res.redirect('/admin/Category');
+    //     //         message = 'Category Listed successfully';
+    //     //     } else {
+    //     //         res.redirect('/admin/Category');
+    //     //         message = 'Category not found';
+    //     //     }
+
+
+    const delCat = req.query.id;
+
+try {
+    // const product = await productSchema.findOne({ category: delCat });
+    const category = await categorySchema.findOne({ _id: delCat });
+
+    if (category) {
+        if (category.is_List === true) {
+            await categorySchema.updateOne({ _id: delCat }, { $set: { is_List: false } });
+            message='Category Unlisted successfully';
         } else {
-            if (category && category.is_List === true) {
-                await categorySchema.updateOne({ _id: delCat }, { $set: { is_List: false } });
-                res.redirect('/admin/Category');
-                message = 'Category deleted successfully';
-            } else if (category && category.is_List === false) {
-                await categorySchema.updateOne({ _id: delCat }, { $set: { is_List: true } });
-                res.redirect('/admin/Category');
-                message = 'Category Listed successfully';
-            } else {
-                res.redirect('/admin/Category');
-                message = 'Category not found';
-            }
+            await categorySchema.updateOne({ _id: delCat }, { $set: { is_List: true } });
+            message= 'Category Listed successfully';
         }
+        res.redirect('/admin/Category');
+    } else {
+       msg='Category not found';
+        res.redirect('/admin/Category');
+    }
+        
     } catch (error) {
         console.log(error);
     }

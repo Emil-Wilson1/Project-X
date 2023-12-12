@@ -39,7 +39,7 @@
                         <h6 class="mb-0" id="productTotal<%=item._id%>">₹ <%=item.price*item.quantity%></h6>
                       </div>
                       <div class="col-md-1 col-lg-1 col-xl-1 text-end">
-                        <td class="cart__close"><a href="/removeCart?id=<%=item._id%>"><span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"/></svg></span></a></td>
+                        <td class="cart__close"><a href="/removeCart?id=<%=item._id%>" class="remove-cart" data-product-id="<%=item._id%>"><span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12z"/></svg></span></a></td>
                       </div>
                     </div>
   
@@ -141,4 +141,45 @@ minusBtns.forEach(btn => {
 });
 
 </script>
+
+<script>
+
+$(document).ready(function() {
+        $('.remove-cart').on('click', function(event) {
+            event.preventDefault(); // Prevent the default behavior of the anchor tag
+            
+            const productId = $(this).data('product-id');
+            
+            // Show a confirmation dialog using SweetAlert
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Do you want to remove this item from your item?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, remove it!'
+            }).then((result) => {
+                // If the user confirms deletion
+                if (result.isConfirmed) {
+                    // Send AJAX request to remove the item from the wishlist
+                    $.ajax({
+                        url: `/removeCart?id=${productId}`,
+                        method: 'GET',
+                        success: function(response) {
+                            if (response.success) {
+                                // Remove the item from the wishlist on the client-side without reloading
+                                location.reload();
+                                $(event.target).closest('li').remove();
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error removing item from wishlist:', error);
+                        }
+                    });
+                }
+            });
+        });
+    });
+            </script>
 <%- include('../layouts/pagesFooter.ejs') %>

@@ -32,19 +32,22 @@ const userSchema = mongoose.Schema({
     }, is_blocked: {
         type: Number,
         default: 0
-    },token:{
-        type:String,
-        default:''
+    }, token: {
+        type: String,
+        default: ''
     }, wishlist: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Products'
     }], wallet: {
         type: Number,
-    },redeemed:{
-        type:Boolean,
-        default:false
-        }
-    
+    }, redeemed: {
+        type: Boolean,
+        default: false
+    }, referalId: {
+        type: String,
+        
+    }
+
 })
 
 module.exports = mongoose.model('User', userSchema)

@@ -1,5 +1,28 @@
 <%- include('../layouts/header.ejs') %>
 
+<style>
+    html, body {
+    height: 100%;
+    margin: 0;
+  }
+  
+  #wrapper {
+    display: flex;
+  }
+  
+  #sidebar-wrapper {
+    min-height: 100vh; /* Set the minimum height of the sidebar to the viewport height */
+   width: 200px;
+  }
+  
+  /* Additional styling for other elements */
+  /* Adjust as needed */
+  #page-content-wrapper {
+    flex: 1;
+    padding: 20px; /* Example padding */
+  }
+  
+  </style>
 
 <body id="reportsPage">
     <div class="d-flex" id="wrapper">
@@ -30,9 +53,10 @@
                 <a href="/admin/order" class="list-group-item list-group-item-action bg-dark text-white">
                     Order
                 </a>
-                <a href="/admin/coupon" class="list-group-item list-group-item-action bg-dark text-white">
-                    Order
+                <a href="/admin/coupon" class="list-group-item list-group-item-action sidebar-link active text-white">
+                    Coupon
                 </a>
+                <a href="/admin/offer" class="list-group-item list-group-item-action bg-dark text-white">Offer</a>
             </div>
             <!-- Additional sidebar items -->
         </div>
@@ -54,6 +78,7 @@
                     <thead>
                  <tr>
                      <th class="th-sm text-center">Name</th>
+                     <th class="th-sm text-center">Code</th>
                      <th class="th-sm text-center">Start Date</th>
                      <th class="th-sm text-center">End Date</th>
                      <th class="th-sm text-center">Action</th>
@@ -67,6 +92,7 @@
                      <%coupons.forEach(coupon => {%>
                          <tr class="">
                              <td class="text-center" ><%=coupon.couponName%></td>
+                             <td class="text-center" ><%=coupon.couponCode%></td>
                              <td class="text-center"><%=coupon.startDate.toDateString()%></td>
                              <td class="text-center"><%=coupon.endDate.toDateString()%></td>
               

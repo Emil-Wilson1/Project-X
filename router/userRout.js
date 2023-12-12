@@ -64,6 +64,8 @@ user_route.get('/singleProduct',auth.logOutSession,cartController.productDetails
 
 user_route.get('/shopPage',cartController.loadShopPage)
 
+user_route.post('/shopFilter',cartController.productFilter)
+
 user_route.get('/checkOut',auth.logOutSession,userController.loadChekOut)
 
 user_route.get('/addAddress',auth.logOutSession,userController.addAddress)
@@ -85,8 +87,8 @@ user_route.get('/changePassword',auth.logOutSession,userController.loadChangePas
 
 user_route.post('/changePassword',auth.logOutSession,userController.changePswd)
 
-
 user_route.get('/placeOrder',auth.logOutSession,orderController.loadPlaceOrder)
+
 
 user_route.post('/orderConfirm',auth.logOutSession,userController.orderConfirm)
 
@@ -113,6 +115,17 @@ user_route.get('/decrementcart',auth.logOutSession,cartController.decrementCart)
 //user_route.get('/home',auth.logOutSession,cartController.loadHome)
 
 user_route.get('/removeCart',auth.logOutSession,cartController.removeCart)
+
+user_route.post('/checkCoupon',auth.logOutSession,userController.addCoupon)
+
+user_route.post('/removeCoupon',auth.logOutSession,userController.removeCoupon)
+
+
+user_route.get('/wishlist',auth.logOutSession,cartController.loadWishList)
+
+user_route.get('/addToWishlist',auth.logOutSession,cartController.addToWishlist)
+
+user_route.get('/removeWishlist',auth.logOutSession,cartController.removeWishlist)
 
 
 // user_route.post('/shopFilter',userController.productFilter)

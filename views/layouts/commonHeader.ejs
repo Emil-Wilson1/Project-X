@@ -43,6 +43,42 @@
      <link rel="stylesheet" href="magiczoomplus/magiczoomplus.css">
      <link rel="stylesheet" href="magiczoomplus/magiczoomplus.min.js">
      <script src="https://unpkg.com/js-image-zoom@0.4.1/js-image-zoom.js" type="application/javascript"></script>
+     <style>
+        .cart-icon {
+      position: relative;
+      display: inline-block;
+      align-items: center;
+    }
+    
+    .icon_bag_alt {
+      /* Your icon styles here */
+      /* For example: */
+      font-size: 24px;
+      color: black;
+    }
+    
+    
+    
+    .cart-counter {
+      position: absolute;
+      bottom: 10px;
+      right: -8px;
+      background-color: red;
+      color: white;
+      border-radius: 50%;
+      padding: 5px;
+      width: 20px; /* Set the width and height to create a circle */
+      height: 20px; /* Same as width for a perfect circle */
+      text-align: center;
+      font-size: 12px;
+      font-weight: bold;
+      line-height: 20px; /* Center the text vertically */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    </style>
 </head>
 <body>
 
@@ -104,7 +140,9 @@
                             <div class="btn-group">
                                 <ul class="header__right__widget mt-2 mr-3">
                                     <li><a href="/wishlist" data-bs-toggle="tooltip" data-bs-placement="top" title="Wishlist"><span class="icon_heart_alt"></span></a></li>
-                                    <li><a href="/cart" data-bs-toggle="tooltip" data-bs-placement="top" title="Cart"><span class="icon_bag_alt"></span></a></li>
+                                   
+                                        <li><a href="/cart" data-bs-toggle="tooltip" data-bs-placement="top" title="Cart"><span class="icon_bag_alt"></span></a></li>
+                                      
                                 </ul>
                                 <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton1"
                                     data-bs-toggle="dropdown"><svg xmlns="http://www.w3.org/2000/svg" width="24"
@@ -136,3 +174,5 @@
         </div>
     </div>
 </header>
+
+
