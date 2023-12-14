@@ -24,7 +24,7 @@ const addCategory = async (req, res) => {
     const category = categorySchema({
         category: newCat
     })
-    const checkCat = await categorySchema.findOne({ category: newCat })
+    const checkCat = await categorySchema.findOne({ category: { $regex: new RegExp('^' + newCat + '$', 'i') } });
     if (newCat.trim().length === 0) {
         res.redirect('/admin/addCategory')
         msg = 'Please fill submited area'
@@ -58,7 +58,7 @@ const editCategory = async (req, res) => {
     try {
         const Cat = req.query.id
         const newCat = req.body.newcategory
-        const checkNew = await categorySchema.findOne({ category: newCat })
+        const checkNew = await categorySchema.findOne({ category: { $regex: new RegExp('^' + newCat + '$', 'i') } });
         if (checkNew) {
             res.redirect("/admin/Category")
             msg = 'New edited category already exist'

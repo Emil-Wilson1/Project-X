@@ -96,10 +96,39 @@
     </script>
 <%}%>
 
+
+
+
 <script>
   
 
 
+
+// const plusBtns = document.querySelectorAll('.quantity__plus');
+// plusBtns.forEach(btn => {
+//     btn.addEventListener('click', function(event) {
+//         event.preventDefault();
+//         const proid = event.target.dataset.id;
+//         const userId = '<%=session%>';
+//         fetch(`/incrementCart?id=${proid}&userId=${userId}`)
+//         .then(res => res.json())
+//         .then(data => {
+           
+//             const quantityEl = event.target.parentElement.querySelector('#quantity-');
+//             quantityEl.innerText = data.quantity;
+//            document.querySelector(`#productTotal${proid}`).textContent ='₹'+ data.price
+//            document.querySelector('#TotalPrice').innerText ='₹'+ data.totalPrice
+//            if(data.success==false){
+//               Swal.fire({
+//                     icon: 'error',
+//                     title: 'Oops...',
+//                     text: "Item Out of Stock",
+//                 })
+//             }
+//         })
+//         .catch(err => console.log(err))
+//     });
+// });
 
 const plusBtns = document.querySelectorAll('.quantity__plus');
 plusBtns.forEach(btn => {
@@ -108,19 +137,34 @@ plusBtns.forEach(btn => {
         const proid = event.target.dataset.id;
         const userId = '<%=session%>';
         fetch(`/incrementCart?id=${proid}&userId=${userId}`)
-        .then(res => res.json())
-        .then(data => {
-            
-            const quantityEl = event.target.parentElement.querySelector('#quantity-');
-            quantityEl.innerText = data.quantity;
-           document.querySelector(`#productTotal${proid}`).textContent ='₹'+ data.price
-           document.querySelector('#TotalPrice').innerText ='₹'+ data.totalPrice
-        })
-        .catch(err => console.log(err))
+            .then(res => {
+                if (!res.ok) {
+                    return res.json().then(data => Promise.reject(data.error)); // Handling the error response
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (data.success === false) {
+                    // Display a SweetAlert if the item is out of stock
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: "Item Out of Stock",
+                    });
+                } else {
+                    // Update the UI with the new quantity and total price if the increment is successful
+                    const quantityEl = event.target.parentElement.querySelector('#quantity-');
+                    quantityEl.innerText = data.quantity;
+                    document.querySelector(`#productTotal${proid}`).textContent = '₹' + data.price;
+                    document.querySelector('#TotalPrice').innerText = '₹' + data.totalPrice;
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                // Handle other errors if necessary
+            });
     });
 });
-
-
 const minusBtns = document.querySelectorAll('.quantity__minus');
 minusBtns.forEach(btn => {
     btn.addEventListener('click', function(event) {

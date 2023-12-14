@@ -73,6 +73,7 @@ admin_rout.post('/proImage',auth.logOutSession,productController.singleRemove)
 
 admin_rout.get('/salesReport',auth.logOutSession,adminController.loadSalesPage)
 
+
 admin_rout.get('/coupon',auth.logOutSession,adminController.loadCoupons)
 
 admin_rout.get('/addCoupon',auth.logOutSession,adminController.loadAddCoupon)

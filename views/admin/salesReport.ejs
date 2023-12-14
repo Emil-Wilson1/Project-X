@@ -429,7 +429,7 @@ crossorigin="anonymous"></script>
                           </div>
                     <div class="table-filter">
                       <div class="row">
-                                  <form id="sales-filter">
+                                  <!-- <form id="sales-filter">
                                       <label for="filter">Filter by:</label>
                                       <select id="filter" name="filter">
                                         <option value="all">All Time</option>
@@ -439,10 +439,24 @@ crossorigin="anonymous"></script>
                                       </select>
                                       <button type="submit">Generate Report</button>
                                     </form>
+                                   -->
+
+                                    <!-- Form to input start and end dates -->
+  <form id="dateFilterForm">
+    <label for="startDate">Start Date:</label>
+    <input type="date" id="startDate" name="startDate" required>
+    <label for="endDate">End Date:</label>
+    <input type="date" id="endDate" name="endDate" required>
+    <button type="submit">Filter</button>
+    <button id="resetFilter">Reset</button> <!-- Button to reset filters -->
+  </form>
+                                
+                                 
                               </div>
                     </div>
-                    <div class="tm-block tm-block-taller tm-block-scroll">
-                      <table class="table" id="salesTable">
+
+                     <div class="tm-block tm-block-taller tm-block-scroll">
+                     <table class="table" id="salesTable">
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -476,7 +490,15 @@ crossorigin="anonymous"></script>
                             
                         </tbody>
                     </table>
+
+
+                   
                     </div>
+
+
+                 
+
+                  
                           
                     <div class="clearfix">
                               <ul class="pagination">
@@ -500,6 +522,9 @@ crossorigin="anonymous"></script>
    
 
 <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+
+s
+
 <script>
 
 function printTable() {

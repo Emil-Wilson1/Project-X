@@ -8,6 +8,7 @@ const couponSchema = require('../models/couponModel')
 const orderSchema = require('../models/orderModel')
 const offerSchema = require('../models/offerModel')
 const cartSchema = require('../models/cartModel')
+const walletHistory = require('../models/walletHistoryModel')
 const randomString = require('randomstring')
 const { reset } = require('nodemon')
 require('dotenv').config();
@@ -154,6 +155,26 @@ const referralSubmit = async (req, res, next) => {
             await User.updateOne({ _id: user._id }, { $inc: { wallet: 100 } });
             await User.updateOne({ _id: session }, { $inc: { wallet: 50 } });
             await User.updateOne({ _id: session }, { $set: { redeemed: true } });
+       // Create wallet history entries for both users' transactions
+       const creditedEntryUser1 = new walletHistory({
+        user: user._id, // Assuming user1._id represents the user1's ID
+        transactionType: 'Referral Bonus', // You can define a transaction type for crediting
+        amount: 100,
+        transactionDate: new Date() // Set transaction date as current date/time
+        // Add other fields as per your schema definition
+    });
+
+    const creditedEntryUser2 = new walletHistory({
+        user: session, // Assuming 'session' represents user2's ID
+        transactionType: 'Referral Bonus', // You can define a transaction type for crediting
+        amount: 50,
+        transactionDate: new Date() // Set transaction date as current date/time
+        // Add other fields as per your schema definition
+    });
+
+    // Save the wallet history entries for both users' transactions
+    await creditedEntryUser1.save();
+    await creditedEntryUser2.save();
             console.log("100 credited");
             res.redirect("/userProfile");
             message = "Successfully Redeemed";
@@ -1300,6 +1321,18 @@ const orderConfirm = async (req, res, next) => {
                 if (user.wallet >= payMoney) {
                     console.log("deducted");
                     await User.findByIdAndUpdate({ _id: session }, { $inc: { wallet: -payMoney } });
+                    // Create a wallet history entry for the deposit transaction
+                    const depositEntry = new walletHistory({
+                        user: session,
+                        transactionType: 'Purchase', // Assuming this is a deposit into the wallet
+                        amount: payMoney,
+                        transactionDate: new Date(),
+
+                    });
+
+                    // Save the wallet history entry
+                    await depositEntry.save();
+
                     console.log("updated");
                     orderStatus = 1;
                     res.redirect('/userProfile');
@@ -1480,6 +1513,17 @@ const cancelOrder = async (req, res, next) => {
                 await User.findByIdAndUpdate({ _id: session }, { $set: { wallet: orders.totalPrice } })
             }
         }
+        // Create a wallet history entry for the deposit transaction
+        const depositEntry = new walletHistory({
+            user: session,
+            transactionType: 'Refund', // Assuming this is a deposit into the wallet
+            amount: orders.totalPrice,
+            transactionDate: new Date(),
+
+        });
+
+        // Save the wallet history entry
+        await depositEntry.save();
 
         orders.item.forEach(async (item) => {
             const productId = item.product._id
@@ -1512,6 +1556,17 @@ const returnOrder = async (req, res, next) => {
         } else {
             await User.findByIdAndUpdate({ _id: userId }, { $set: { wallet: Price } })
         }
+        // Create a wallet history entry for the deposit transaction
+        const depositEntry = new walletHistory({
+            user: userId,
+            transactionType: 'Refund', // Assuming this is a deposit into the wallet
+            amount: Price,
+            transactionDate: new Date(),
+
+        });
+
+        // Save the wallet history entry
+        await depositEntry.save();
 
         order.item.forEach(async (item) => {
             const productId = item.product._id
@@ -1589,6 +1644,20 @@ const removeCoupon = async (req, res, next) => {
 
 }
 
+const wallet = async (req, res) => {
+    try {
+
+        const session = req.session.user_id
+        // Fetch wallet history data from the database (replace this with your logic)
+        const WalletHistory = await walletHistory.find({ user: session }).exec();
+
+        // Pass wallet history data to the EJS template for rendering
+        res.render('walletHistory', { WalletHistory, session });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+};
 module.exports = {
     userSignup,
     insertUser,
@@ -1628,4 +1697,5 @@ module.exports = {
     returnOrder,
     sendResend,
     removeCoupon,
+    wallet,
 }

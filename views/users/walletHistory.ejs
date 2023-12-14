@@ -1,0 +1,44 @@
+<%- include('../layouts/commonHeader.ejs') %>
+<div class="container">
+    <!-- row -->
+
+    <div class="col-12 tm-block-col">
+<div class="tm-block tm-block-taller tm-block-scroll">
+    <table class="table" id="walletHistoryTable">
+        <thead>
+            <tr>
+                <th>Transaction Date</th>
+                <th>Transaction Type</th>
+                <th>Amount</th>
+               
+                
+            </tr>
+        </thead>
+        <tbody>
+            <% if (WalletHistory && WalletHistory.length > 0) { %>
+                <% WalletHistory.filter(transaction => transaction.user.toString() === session.toString()).forEach((transaction, index) => { %>
+                    <td style="font-size: 12px;"><%= transaction.transactionDate.toDateString() %></td>
+                    <td style="font-size: 12px;"><%= transaction.transactionType %></td>
+                    <td style="font-size: 12px;">
+                      <% if (transaction.transactionType === 'Purchase') { %>
+                        <span style="color: red;">-<%= transaction.amount %></span>
+                      <% } else if (transaction.transactionType === 'Referral Bonus' || transaction.transactionType === 'Refund') { %>
+                        <span style="color: green;">+<%= transaction.amount %></span>
+                      <% } else { %>
+                        <%= transaction.amount %>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }); %>
+              <% } else { %>
+                <tr>
+                  <td colspan="3" style="font-size: 12px;">No wallet history data available.</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>
+</div>
+</div>
+
+<%- include('../layouts/pagesFooter.ejs') %>

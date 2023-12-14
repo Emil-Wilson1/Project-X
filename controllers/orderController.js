@@ -34,8 +34,7 @@ const loadPlaceOrder = async (req, res, next) => {
         let maxDiscount=0;
         const pro = await cartSchema.findOne({ userId: session }, { _id: 0 })
         const user = await User.findOne({ _id: session })
-         const amo=req.body.amount
-         console.log(amo);
+       
          const cart = await cartSchema
         .findOne({ userId: session })
         .populate({

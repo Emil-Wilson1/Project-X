@@ -94,93 +94,150 @@ const loadAdminHome = async (req, res) => {
 }
 
 
-const loadSalesPage = async (req, res) => {
-    try {
+// const loadSalesPage = async (req, res) => {
+//     try {
 
-        let filter = '';
-        if (req.query.filter) {
-            filter = req.query.filter;
-        }
+//         let filter = '';
+//         if (req.query.filter) {
+//             filter = req.query.filter;
+//         }
 
-        let page = 1;
-        if (req.query.page) {
-            page = req.query.page;
-        }
+//         let page = 1;
+//         if (req.query.page) {
+//             page = req.query.page;
+//         }
 
-        let sales = [];
-        let count
-        if (filter === 'all') {
-            sales = await salesSchema.find({}).populate('userId').limit(6).skip((page - 1) * 6).exec();
-            count = await salesSchema.find({}).countDocuments()
-        } else if (filter === 'weekly') {
-            const startOfWeek = moment().startOf('week').toDate();
-            const endOfWeek = moment().endOf('week').toDate();
+//         let sales = [];
+//         let count
+//         if (filter === 'all') {
+//             sales = await salesSchema.find({}).populate('userId').limit(6).skip((page - 1) * 6).exec();
+//             count = await salesSchema.find({}).countDocuments()
+//         } else if (filter === 'weekly') {
+//             const startOfWeek = moment().startOf('week').toDate();
+//             const endOfWeek = moment().endOf('week').toDate();
 
-            sales = await salesSchema
-                .find({
-                    date: {
-                        $gte: startOfWeek,
-                        $lte: endOfWeek,
-                    },
-                })
-                .populate('userId').limit(6).skip((page - 1) * 6).exec();
+//             sales = await salesSchema
+//                 .find({
+//                     date: {
+//                         $gte: startOfWeek,
+//                         $lte: endOfWeek,
+//                     },
+//                 })
+//                 .populate('userId').limit(6).skip((page - 1) * 6).exec();
 
-            count = await salesSchema
-                .find({
-                    date: {
-                        $gte: startOfWeek,
-                        $lte: endOfWeek,
-                    },
-                }).countDocuments()
+//             count = await salesSchema
+//                 .find({
+//                     date: {
+//                         $gte: startOfWeek,
+//                         $lte: endOfWeek,
+//                     },
+//                 }).countDocuments()
 
-        } else if (filter === 'yearly') {
-            const startOfYear = moment().startOf('year').toDate();
-            const endOfYear = moment().endOf('year').toDate();
+//         } else if (filter === 'yearly') {
+//             const startOfYear = moment().startOf('year').toDate();
+//             const endOfYear = moment().endOf('year').toDate();
 
-            sales = await salesSchema
-                .find({
-                    date: {
-                        $gte: startOfYear,
-                        $lte: endOfYear,
-                    },
-                })
-                .populate('userId').limit(6).skip((page - 1) * 6).exec();
-            count = await salesSchema
-                .find({
-                    date: {
-                        $gte: startOfYear,
-                        $lte: endOfYear,
-                    },
-                }).countDocuments()
-        } 
-        else if(filter=='today'){
-            const today = moment().startOf('day').toDate();
-           sales = await salesSchema
-        .find({
-            date: {
-                $gte: today, 
-                $lte: moment(today).endOf('day').toDate(),
-            },
-        })
-        .populate('userId').limit(6).skip((page - 1) * 6).exec();
+//             sales = await salesSchema
+//                 .find({
+//                     date: {
+//                         $gte: startOfYear,
+//                         $lte: endOfYear,
+//                     },
+//                 })
+//                 .populate('userId').limit(6).skip((page - 1) * 6).exec();
+//             count = await salesSchema
+//                 .find({
+//                     date: {
+//                         $gte: startOfYear,
+//                         $lte: endOfYear,
+//                     },
+//                 }).countDocuments()
+//         } 
+//         else if(filter=='today'){
+//             const today = moment().startOf('day').toDate();
+//            sales = await salesSchema
+//         .find({
+//             date: {
+//                 $gte: today, 
+//                 $lte: moment(today).endOf('day').toDate(),
+//             },
+//         })
+//         .populate('userId').limit(6).skip((page - 1) * 6).exec();
         
-        count = await salesSchema
-        .find({
-            date: {
-                $gte: today, 
-                $lte: moment(today).endOf('day').toDate(),
-            },
-        }).countDocuments()
+//         count = await salesSchema
+//         .find({
+//             date: {
+//                 $gte: today, 
+//                 $lte: moment(today).endOf('day').toDate(),
+//             },
+//         }).countDocuments()
 
-        }else {
-            sales = await salesSchema.find().populate('userId').limit(6).skip((page - 1) * 6).exec()
-            count = await salesSchema.find().countDocuments()
-        }
-        res.render('salesReport', { sales, page, totalPages: Math.ceil(count / 6) });
-    } catch (error) {
-        console.log(error.message);
+//         }else {
+//             sales = await salesSchema.find().populate('userId').limit(6).skip((page - 1) * 6).exec()
+//             count = await salesSchema.find().countDocuments()
+//         }
+//         res.render('salesReport', { sales, page, totalPages: Math.ceil(count / 6) });
+//     } catch (error) {
+//         console.log(error.message);
+//     }
+// };
+
+
+
+const loadSalesPage = async (req, res) => {
+  try {
+    let page = 1;
+    if (req.query.page) {
+      page = req.query.page;
     }
+
+    let sales = [];
+    let count;
+    let startDate, endDate;
+
+    if (req.query.startDate && req.query.endDate) {
+      startDate = moment(req.query.startDate).startOf('day').toDate();
+      endDate = moment(req.query.endDate).endOf('day').toDate();
+
+      sales = await salesSchema
+        .find({
+          date: {
+            $gte: startDate,
+            $lte: endDate,
+          },
+        })
+        .populate('userId')
+        .limit(6)
+        .skip((page - 1) * 6)
+        .exec();
+
+      count = await salesSchema
+        .find({
+          date: {
+            $gte: startDate,
+            $lte: endDate,
+          },
+        })
+        .countDocuments();
+    } else {
+      // If no start and end date provided, fetch all sales data
+      sales = await salesSchema
+        .find()
+        .populate('userId')
+        .limit(6)
+        .skip((page - 1) * 6)
+        .exec();
+
+      count = await salesSchema.find().countDocuments();
+    }
+
+    res.render('salesReport', { sales, page, totalPages: Math.ceil(count / 6) });
+  } catch (error) {
+    console.log(error.message);
+  }
 };
+
+
 
 // LOGOUT
 

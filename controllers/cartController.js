@@ -388,8 +388,8 @@ const incrementCart = async (req, res, next) => {
         const product = await productSchema.findOne({ _id: item.product })
         if (item) {
             if (item.quantity >= product.stocks) {
-                msg = 'Item out of stock'
-                res.redirect('/cart');
+                 res.json({ success: false });
+               // res.redirect('/cart');
             } else {
                 await cartSchema.updateOne({ userId: userId, "item._id": itemid }, { $inc: { "item.$.quantity": 1 } });
                 let total = 0

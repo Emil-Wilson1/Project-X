@@ -100,6 +100,8 @@ user_route.get('/cancelOrder',auth.logOutSession,userController.cancelOrder)
 
 user_route.get('/orderHistory',auth.logOutSession,userController.loadOrderHistory)
 
+user_route.get('/walletHistory',auth.logOutSession,userController.wallet)
+
 user_route.get('/returnOrder',auth.logOutSession,userController.returnOrder)
 
 user_route.post("/deleteAddress", auth.logOutSession,userController.deleteAddress);
