@@ -599,7 +599,7 @@ const sendResetPasswordMail = async (name, email, token) => {
             from: "emilwilson67@gmail.com",
             to: email,
             subject: 'For Change Password',
-            html: `<p>Hii ${name}, please click <a href="http://localhost:3000/resetpass?token=${token}">here</a> to verify your email.</p>`,
+            html: `<p>Hii ${name}, please click <a href="http://localhost:3001/resetpass?token=${token}">here</a> to verify your email.</p>`,
         }
 
         transporter.sendMail(mailOption, (error, info) => {
