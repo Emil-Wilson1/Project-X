@@ -140,38 +140,40 @@
             </div>
         </div>
     </header>
-
-<!-- <section class=" set-bg" >
-  <div class="container">
-      <div class="row">
-          <div class="col-xl-7 col-lg-8 m-auto">
-              <div class="banner__slider owl-carousel">
-                  <div class="banner__item">
-                      <div class="banner__text">
-                          <span></span>
-                          <h1 class="text-dark">></h1>
-                          <a href="/shopPage">Shop now</a>
-                      </div>
-                  </div>
-                  <div class="banner__item">
-                      <div class="banner__text">
-                          <span></span>
-                          <h1 class="text-dark"></h1>
-                          <a href="/shopPage">Shop now</a>
-                      </div>
-                  </div>
-                  <div class="banner__item">
-                      <div class="banner__text">
-                          <span></span>
-                          <h1 class="text-dark"></h1>
-                          <a href="/shopPage">Shop now</a>
+    <%if(banner){%>
+        <section class="banner set-bg" data-setbg="bannerImg/<%=banner.image%>">
+          <div class="container">
+              <div class="row">
+                  <div class="col-xl-7 col-lg-8 m-auto">
+                      <div class="banner__slider owl-carousel">
+                          <div class="banner__item">
+                              <div class="banner__text">
+                                  <span><%=banner.heading1%></span>
+                                  <h1 class="text-dark"><%=banner.description1%></h1>
+                                  <a href="/shopPage">Shop now</a>
+                              </div>
+                          </div>
+                          <div class="banner__item">
+                              <div class="banner__text">
+                                  <span><%=banner.heading2%></span>
+                                  <h1 class="text-dark"><%=banner.description2%></h1>
+                                  <a href="/shopPage">Shop now</a>
+                              </div>
+                          </div>
+                          <div class="banner__item">
+                              <div class="banner__text">
+                                  <span><%=banner.heading3%></span>
+                                  <h1 class="text-dark"><%=banner.description3%></h1>
+                                  <a href="/shopPage">Shop now</a>
+                              </div>
+                          </div>
                       </div>
                   </div>
               </div>
           </div>
-      </div>
-  </div>
-</section> -->
+        </section>
+        
+        <%}%>
 
 
    

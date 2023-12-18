@@ -1,0 +1,184 @@
+<%- include('../layouts/header.ejs') %>
+<style>
+    html, body {
+    height: 100%;
+    margin: 0;
+  }
+  
+  #wrapper {
+    display: flex;
+  }
+  
+  #sidebar-wrapper {
+    min-height: 100vh; /* Set the minimum height of the sidebar to the viewport height */
+   width: 200px;
+  }
+  
+  /* Additional styling for other elements */
+  /* Adjust as needed */
+  #page-content-wrapper {
+    flex: 1;
+    padding: 20px; /* Example padding */
+  }
+  
+  
+  </style>
+  
+<body id="reportsPage">
+    <div class="d-flex" id="wrapper">
+      <!-- Sidebar -->
+      <div class="bg-dark border-right" id="sidebar-wrapper">
+        <div class="sidebar-heading text-white">
+          <a href="/admin/" class="text-white text-decoration-none">
+            <h1 class="tm-site-title mb-0 font"><span class="text-1000 text-white fs-1 mt-3 fw-bold ms-2">FINITO</span></h1>
+          </a>
+        </div>
+        <div class="list-group list-group-flush " >
+          <a href="/admin/home" class="list-group-item list-group-item-action bg-dark text-white  ">Dashboard</a>
+          <a href="/admin/userData" class="list-group-item list-group-item-action bg-dark text-white">UserData</a>
+          <a href="/admin/addProduct" class="list-group-item list-group-item-action bg-dark text-white">Add Product</a>
+          <a href="/admin/order" class="list-group-item list-group-item-action bg-dark text-white">Order</a>
+          <a href="/admin/products" class="list-group-item list-group-item-action bg-dark text-white">Products</a>
+          <a href="/admin/category" class="list-group-item list-group-item-action bg-dark text-white">Category</a>
+          
+       
+          <a href="/admin/coupon" class="list-group-item list-group-item-action bg-dark text-white">Coupon</a>
+          <a href="/admin/offer" class="list-group-item list-group-item-action bg-dark text-white">Offer</a>
+          <a href="/admin/banner" class="list-group-item list-group-item-action  text-white sidebar-link active ">Banner</a>
+          <a href="/admin/logout" class="list-group-item list-group-item-action bg-dark text-white">Logout</a>
+        
+         
+        </div>
+      </div>
+      <!-- /#sidebar-wrapper -->
+  
+      <!-- Page Content -->
+      <div id="page-content-wrapper">
+        <div class="container-fluid">
+          <!-- Your existing content goes here -->
+          <!-- ... -->
+          <!-- Your existing content continues -->
+          <div class="container tm-mt-big tm-mb-big">
+            <div class="row">
+              <div class="col-xl-9 col-lg-10 col-md-12 col-sm-12 mx-auto ">
+                <div class="tm-bg-primary-dark tm-block tm-block-h-auto">
+          <form action="/admin/addBanner" method="post" id="addBannerform" class="tm-edit-product-form"
+          enctype="multipart/form-data">
+          <div class="row tm-edit-product-row">
+            <div class="col-xl-6 col-lg-6 col-md-12">
+          <div class="form-group mb-3 text-white">
+            <h6>Banner Heading 1</h6>
+            <input name="heading1" type="text" id="heading1" class="form-control" />
+          </div>
+          <div class="form-group mb-3 text-white">
+            <h6>Banner Heading 2</h6>
+            <input name="heading2" type="text" id="heading2" class="form-control" />
+          </div>
+          <div class="form-group mb-3 text-white">
+            <h6>Banner Heading 3</h6>
+            <input name="heading3" type="text" id="heading3" class="form-control" />
+          </div>
+          <div class="form-group mb-3 text-white">
+            <h6>Description 1</h6>
+            <input name="description1" type="text" id="description1" class="form-control" />
+          </div>
+          <div class="form-group mb-3 text-white">
+            <h6>Description 2</h6>
+            <input name="description2" type="text" id="description2" class="form-control" />
+          </div>
+          <div class="form-group mb-3 text-white">
+            <h6>Description 3</h6>
+            <input name="description3" type="text" id="description3" class="form-control" />
+          </div>
+        </div>
+      <div class="col-xl-6 col-lg-6 col-md-12 mx-auto mb-4">
+        <div>
+          <div class="d-flex justify-content-center">
+            <div class="btn btn-dark btn-rounded">
+              <label class="form-label text-white" for="customFile2">
+                <h6>Add Image</h6>
+              </label>
+              <input type="file" name="image" class="form-control" id="customFile2"
+                onchange="return fileValidation()"/>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 mb-4">
+        <button type="submit" class="btn btn-dark">Add Banner Now</button>
+      </div>
+      <h6 class="error text-warning"></h6>
+      </form>
+      </div>
+      </div>
+      </div>
+      </div>
+    </div>
+      <!-- /#page-content-wrapper -->
+    </div>
+  </body>
+
+  
+  <script>
+    const form = document.getElementById("addBannerform");
+    const heading1 = document.getElementById("heading1");
+    const heading2 = document.getElementById("heading2");
+    const heading3 = document.getElementById("heading3");
+    const description1 = document.getElementById("description1");
+    const description2 = document.getElementById("description2");
+    const description3 = document.getElementById("description3");
+    const errorElement = document.querySelector('.error');
+
+    form.addEventListener('submit', (e) => {
+          let messages = [];
+
+          if (heading1.value.trim().length === 0) {
+            messages.push('Heading 1 is required');
+          } else if (heading2.value.trim().length === 0) {
+            messages.push('Heading 2 is required');
+          }else if(heading3.value.trim().length===0){
+              messages.push('Heading 3 is required')
+          }else if(description1.value.trim().length === 0){
+              messages.push('Description 1 is required')
+          }else if(description2.value.trim().length === 0){
+              messages.push('Description 2 is required')
+          }else if(description3.value.trim().length === 0){
+              messages.push('Description 3 is required')
+          }
+
+          if (messages.length > 0) {
+            e.preventDefault();
+            errorElement.innerText = messages.join(', ');
+          } else {
+            errorElement.innerText = '';
+          }
+      })
+      
+      function fileValidation() {
+          const fileInput =
+            document.getElementById('customFile2');
+
+          const filePath = fileInput.value;
+
+          const allowedExtensions = /(\.jpg|\.jpeg|\.png)$/i;
+          if (!allowedExtensions.exec(filePath)) {
+            alert('Invalid file type');
+            fileInput.value = '';
+            return false;
+          }
+          else {
+            if (fileInput.files && fileInput.files[0]) {
+              const reader = new FileReader();
+              reader.onload = function (e) {
+                document.getElementById(
+                  'customFile2').innerHTML =
+                  '<img src="' + e.target.result
+                  + '"/>';
+              };
+
+              reader.readAsDataURL(fileInput.files[0]);
+            }
+          }
+        }
+</script>
+  <%- include('../layouts/footer.ejs') %>

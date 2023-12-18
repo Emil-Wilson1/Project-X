@@ -1,0 +1,126 @@
+<%- include('../layouts/header.ejs') %>
+<style>
+    html, body {
+    height: 100%;
+    margin: 0;
+  }
+  
+  #wrapper {
+    display: flex;
+  }
+  
+  #sidebar-wrapper {
+    min-height: 100vh; /* Set the minimum height of the sidebar to the viewport height */
+   width: 200px;
+  }
+  
+  /* Additional styling for other elements */
+  /* Adjust as needed */
+  #page-content-wrapper {
+    flex: 1;
+    padding: 20px; /* Example padding */
+  }
+  
+  
+  </style>
+  
+<body id="reportsPage">
+    <div class="d-flex" id="wrapper">
+      <!-- Sidebar -->
+      <div class="bg-dark border-right" id="sidebar-wrapper">
+        <div class="sidebar-heading text-white">
+          <a href="/admin/" class="text-white text-decoration-none">
+            <h1 class="tm-site-title mb-0 font"><span class="text-1000 text-white fs-1 mt-3 fw-bold ms-2">FINITO</span></h1>
+          </a>
+        </div>
+        <div class="list-group list-group-flush " >
+          <a href="/admin/home" class="list-group-item list-group-item-action bg-dark  text-white ">Dashboard</a>
+          <a href="/admin/userData" class="list-group-item list-group-item-action bg-dark text-white">UserData</a>
+          <a href="/admin/addProduct" class="list-group-item list-group-item-action bg-dark text-white">Add Product</a>
+          <a href="/admin/order" class="list-group-item list-group-item-action bg-dark text-white">Order</a>
+          <a href="/admin/products" class="list-group-item list-group-item-action bg-dark text-white">Products</a>
+          <a href="/admin/category" class="list-group-item list-group-item-action bg-dark text-white">Category</a>
+          
+       
+          <a href="/admin/coupon" class="list-group-item list-group-item-action bg-dark text-white">Coupon</a>
+          <a href="/admin/offer" class="list-group-item list-group-item-action bg-dark text-white">Offer</a>
+          <a href="/admin/banner" class="list-group-item list-group-item-action  text-white sidebar-link active ">Banner</a>
+          <a href="/admin/logout" class="list-group-item list-group-item-action bg-dark text-white">Logout</a>
+        
+         
+        </div>
+      </div>
+      <!-- /#sidebar-wrapper -->
+  
+      <!-- Page Content -->
+      <div id="page-content-wrapper">
+        <div class="container-fluid">
+          <!-- Your existing content goes here -->
+          <!-- ... -->
+          <!-- Your existing content continues -->
+          <div class="container">
+            <div class="col-12 tm-block-col">
+          
+              <div class="tm-bg-primary-dark tm-block tm-block-taller tm-block-scroll">
+                <table class="table datatable">
+                  <thead>
+               <tr>
+                   <th class="th-sm">Heading</th>
+                   <th class="th-sm">Description</th>
+                   <th class="th-sm">Action</th>
+               </tr>
+            </thead>
+            
+            
+               
+            <tbody>
+               <% if(banners.length> 0){ %>
+                   <% for(let i=0; i<banners.length; i++){ %>
+                       <tr>
+                           <td><%=banners[i].heading1%></td>
+                           <td><%=banners[i].description1%></td>
+                           <td><a class="btn btn-danger rounded-pill" href="/admin/editBanner?id=<%=banners[i]._id%>" style="font-size: small;">Edit</a>
+                           <a class="btn btn-success rounded-pill" href="/admin/deleteBanner?id=<%= banners[i]._id%>" style="font-size: small;">Delete</a></td>
+                       </tr>
+                   <% } %>
+               <% } else { %>
+                   <tr>
+                       <td colspan="2">Categories Not found</td>
+                   </tr>
+               <% } %>
+            </tbody>
+                     </table>
+          </div></div>
+                     </div>
+                     <div class="d-flex justify-content-center mt-5">
+                     <a href="/admin/addBanner" class="btn btn-dark text-white">Add Banner</a>
+                    </div>
+      <!-- /#page-content-wrapper -->
+    </div>
+  </body>
+           <% if(message){ %>
+            <script>
+          new Swal({
+            title: "Success",
+            text: "<%=message%>",
+            icon: "success",
+            showConfirmButton:false,
+            timer:2000
+          });
+      </script>
+               <% } %> 
+
+               <% if(msg){ %>
+                <script>
+              new Swal({
+                title: "Error",
+                text: "<%=msg%>",
+                icon: "error",
+                showConfirmButton:false,
+                timer:2000
+              });
+          </script>
+                   <% } %> 
+          
+
+      <%- include('../layouts/footer.ejs') %>

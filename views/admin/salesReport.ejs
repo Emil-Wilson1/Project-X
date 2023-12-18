@@ -404,6 +404,8 @@ crossorigin="anonymous"></script>
                       Coupon
                   </a>
                   <a href="/admin/offer" class="list-group-item list-group-item-action bg-dark text-white">Offer</a>
+                  <a href="/admin/banner" class="list-group-item list-group-item-action bg-dark text-white ">Banner</a>
+                  <a href="/admin/logout" class="list-group-item list-group-item-action bg-dark text-white">Logout</a>
                 </div>
                 <!-- Additional sidebar items -->
             </div>
@@ -444,11 +446,11 @@ crossorigin="anonymous"></script>
                                     <!-- Form to input start and end dates -->
   <form id="dateFilterForm">
     <label for="startDate">Start Date:</label>
-    <input type="date" id="startDate" name="startDate" required>
+    <input type="date" id="startDate" name="startDate" value="<%= s %>" required>
     <label for="endDate">End Date:</label>
-    <input type="date" id="endDate" name="endDate" required>
+    <input type="date" id="endDate" name="endDate" value="<%= e %>" required>
     <button type="submit">Filter</button>
-    <button id="resetFilter">Reset</button> <!-- Button to reset filters -->
+    <button type="button" id="resetFilter"><a href="/admin/salesReport" class="text-dark ">Reset</a></button> <!-- Button to reset filters -->
   </form>
                                 
                                  
@@ -523,9 +525,11 @@ crossorigin="anonymous"></script>
 
 <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
 
-s
+
 
 <script>
+
+
 
 function printTable() {
     var table = document.getElementById("salesTable");

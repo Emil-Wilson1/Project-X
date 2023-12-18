@@ -1,15 +1,17 @@
 const userSchema = require('../models/userModel')
- const categorySchema = require('../models/categoryModel')
+const categorySchema = require('../models/categoryModel')
 // const productSchema = require('../models/productModel')
-const salesSchema=require('../models/salesReport')
-const orderSchema=require('../models/orderModel')
-const couponSchema=require('../models/couponModel')
-const offerSchema=require('../models/offerModel')
+const salesSchema = require('../models/salesReport')
+const orderSchema = require('../models/orderModel')
+const couponSchema = require('../models/couponModel')
+const offerSchema = require('../models/offerModel')
+const bannerSchema = require('../models/bannerModel')
 const nodemailer = require('nodemailer')
 const moment = require('moment');
 const bcrypt = require('bcrypt')
 const sharp = require('sharp')
 const path = require('path');
+const { ObjectId } = require('mongodb')
 require('dotenv').config();
 
 let msg
@@ -64,7 +66,7 @@ const loadAdminHome = async (req, res) => {
     try {
         const users = await userSchema.find()
         const usersLength = users.length
-        
+
         const today = new Date()
         today.setHours(0, 0, 0, 0)
         const weekAgo = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7);
@@ -85,7 +87,7 @@ const loadAdminHome = async (req, res) => {
             { $group: { _id: null, totalSales: { $sum: '$totalSales' }, totalItemsSold: { $sum: '$totalItemsSold' } } }
         ]);
         const orders = await orderSchema.find().populate('userId').populate('item.product');
-        res.render('home', { message, usersLength,msg,orders,dailySalesReport,weeklySalesReport,yearlySalesReport });
+        res.render('home', { message, usersLength, msg, orders, dailySalesReport, weeklySalesReport, yearlySalesReport });
         message = null;
     } catch (error) {
         console.log(error);
@@ -163,7 +165,7 @@ const loadAdminHome = async (req, res) => {
 //             },
 //         })
 //         .populate('userId').limit(6).skip((page - 1) * 6).exec();
-        
+
 //         count = await salesSchema
 //         .find({
 //             date: {
@@ -185,56 +187,59 @@ const loadAdminHome = async (req, res) => {
 
 
 const loadSalesPage = async (req, res) => {
-  try {
-    let page = 1;
-    if (req.query.page) {
-      page = req.query.page;
+    try {
+        let page = 1;
+        if (req.query.page) {
+            page = req.query.page;
+        }
+
+        let sales = [];
+        let count;
+        let startDate, endDate;
+        let s;
+        let e;
+        if (req.query.startDate && req.query.endDate) {
+            startDate = moment(req.query.startDate).startOf('day').toDate();
+            endDate = moment(req.query.endDate).endOf('day').toDate();
+            s = req.query.startDate;
+            e = req.query.endDate;
+
+            sales = await salesSchema
+                .find({
+                    date: {
+                        $gte: startDate,
+                        $lte: endDate,
+                    },
+                })
+                .populate('userId')
+                .limit(6)
+                .skip((page - 1) * 6)
+                .exec();
+
+            count = await salesSchema
+                .find({
+                    date: {
+                        $gte: startDate,
+                        $lte: endDate,
+                    },
+                })
+                .countDocuments();
+        } else {
+            // If no start and end date provided, fetch all sales data
+            sales = await salesSchema
+                .find()
+                .populate('userId')
+                .limit(6)
+                .skip((page - 1) * 6)
+                .exec();
+
+            count = await salesSchema.find().countDocuments();
+        }
+
+        res.render('salesReport', { sales, page, totalPages: Math.ceil(count / 6), s, e });
+    } catch (error) {
+        console.log(error.message);
     }
-
-    let sales = [];
-    let count;
-    let startDate, endDate;
-
-    if (req.query.startDate && req.query.endDate) {
-      startDate = moment(req.query.startDate).startOf('day').toDate();
-      endDate = moment(req.query.endDate).endOf('day').toDate();
-
-      sales = await salesSchema
-        .find({
-          date: {
-            $gte: startDate,
-            $lte: endDate,
-          },
-        })
-        .populate('userId')
-        .limit(6)
-        .skip((page - 1) * 6)
-        .exec();
-
-      count = await salesSchema
-        .find({
-          date: {
-            $gte: startDate,
-            $lte: endDate,
-          },
-        })
-        .countDocuments();
-    } else {
-      // If no start and end date provided, fetch all sales data
-      sales = await salesSchema
-        .find()
-        .populate('userId')
-        .limit(6)
-        .skip((page - 1) * 6)
-        .exec();
-
-      count = await salesSchema.find().countDocuments();
-    }
-
-    res.render('salesReport', { sales, page, totalPages: Math.ceil(count / 6) });
-  } catch (error) {
-    console.log(error.message);
-  }
 };
 
 
@@ -261,7 +266,7 @@ const loadUserData = async (req, res) => {
             page = req.query.page
         }
 
-        const limit = 6      
+        const limit = 6
 
         const userData = await userSchema.find(
             {
@@ -331,13 +336,13 @@ const blockUser = async (req, res) => {
             }
         });
         res.redirect('/logoutIn')
-        
+
     } catch (error) {
         console.log(error);
     }
 }
 
-  
+
 
 
 // UNBLOCK USER
@@ -466,7 +471,7 @@ const deleteCoupon = async (req, res) => {
 const loadCat = async (req, res) => {
     try {
         const offers = await offerSchema.find().populate('category');
-        res.render('offer', { msg, message, offers:offers })
+        res.render('offer', { msg, message, offers: offers })
         msg = null
         message = null
     } catch (error) {
@@ -477,7 +482,7 @@ const loadCat = async (req, res) => {
 const loadAddOffer = async (req, res) => {
     try {
         const category = await categorySchema.find()
-        res.render('addOffer', { msg, message,category })
+        res.render('addOffer', { msg, message, category })
         msg = null
         message = null
     } catch (error) {
@@ -487,7 +492,7 @@ const loadAddOffer = async (req, res) => {
 
 const addOffer = async (req, res) => {
     try {
-        const { categoryId, maxDiscount,minPurchase} = req.body; // Assuming categoryId is sent from the form
+        const { categoryId, maxDiscount, minPurchase } = req.body; // Assuming categoryId is sent from the form
 
         // Fetch the category from the database using the provided categoryId
         const existingOffer = await offerSchema.findOne({ category: categoryId });
@@ -500,7 +505,7 @@ const addOffer = async (req, res) => {
             category: categoryId, // Reference to the existing category object
             maxDiscount: maxDiscount,
             status: true,
-            minPurchase:minPurchase
+            minPurchase: minPurchase
             // Other offer properties if needed
         });
 
@@ -519,8 +524,8 @@ const loadEditOffer = async (req, res) => {
         const id = req.query.id
         const offer = await offerSchema.findOne({ _id: id })
         const categories = await categorySchema.find()
-        
-        res.render('editOffer', {offer, msg,categories })
+
+        res.render('editOffer', { offer, msg, categories })
         msg = null
     } catch (error) {
         console.log(error.message);
@@ -530,7 +535,7 @@ const loadEditOffer = async (req, res) => {
 const editOffer = async (req, res) => {
     try {
         const { id } = req.query;
-        const { categoryId, maxDiscount,minPurchase } = req.body;
+        const { categoryId, maxDiscount, minPurchase } = req.body;
 
         // Fetch the offer from the database using the provided ID
         const existingOffer = await offerSchema.findById(id);
@@ -546,20 +551,20 @@ const editOffer = async (req, res) => {
         if (categoryHasOffer && currentCategory._id.toString() !== categoryId) {
             const referer = req.headers.referer || "/";
             res.redirect(referer);
-            msg='Category already has an offer. Cannot apply offer to this category.';
-             
-        }else{
+            msg = 'Category already has an offer. Cannot apply offer to this category.';
 
-        // Update the offer properties
-        existingOffer.category = categoryId;
-        existingOffer.maxDiscount = maxDiscount;
-        existingOffer.minPurchase=minPurchase;
+        } else {
 
-        // Save the updated offer
-        await existingOffer.save();
+            // Update the offer properties
+            existingOffer.category = categoryId;
+            existingOffer.maxDiscount = maxDiscount;
+            existingOffer.minPurchase = minPurchase;
 
-        res.redirect('/admin/Offer'); // Redirect to the offer management page
-        message='Successfully Edited'
+            // Save the updated offer
+            await existingOffer.save();
+
+            res.redirect('/admin/Offer'); // Redirect to the offer management page
+            message = 'Successfully Edited'
         }
     } catch (error) {
         console.log(error.message);
@@ -579,6 +584,118 @@ const deleteOffer = async (req, res) => {
     }
 }
 
+
+const bannersPage = async (req, res) => {
+    try {
+        const banners = await bannerSchema.find()
+        res.render('banners', { message, banners, msg })
+        msg = null,
+            message = null
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+////////LOAD ADD BANNER PAGE////////
+
+const loadAddBanner = async (req, res) => {
+    try {
+        res.render('addBanner')
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+
+//////////ADD BANNER//////////
+
+const addBanner = async (req, res) => {
+    try {
+        const ban = req.body
+        const old = await bannerSchema.find()
+        if (old.length == 0 || old == undefined) {
+            const banner = new bannerSchema({
+                heading1: ban.heading1,
+                heading2: ban.heading2,
+                heading3: ban.heading3,
+                description1: ban.description1,
+                description2: ban.description2,
+                description3: ban.description3,
+                image: req.file.filename
+            })
+
+            banner.save()
+            res.redirect('/admin/banner')
+            message = 'Banner added successfully'
+        } else {
+            res.redirect('/admin/banner')
+            msg = 'There is already have a banner'
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const loadEditBanner = async (req, res) => {
+    try {
+        const id=req.query.id
+        console.log(id);
+        const banner = await bannerSchema.findOne({_id:id})
+        console.log(banner)
+        res.render('editBanner', { banner })
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+const editBanner = async (req, res) => {
+    try {
+        const {id} = req.query;
+        const pro = req.body;
+        console.log(id)
+        const banner= await bannerSchema.findById(id)
+        console.log(banner);
+        await bannerSchema.updateOne({ _id: id}, {
+            $set: {
+                heading1:pro.heading1,
+                heading2:pro.heading2,
+                heading3:pro.heading3,
+                description1:pro.description1,
+                description2:pro.description2,
+                description3:pro.description3,
+            }
+        })
+        if(req.file){
+            await bannerSchema.updateOne({_id : id},{
+                $set:{
+                    image: req.file.filename
+                }
+            })
+        }
+        res.redirect('/admin/banner');
+        message = 'Banner updated successfully';
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
+
+
+
+
+
+////////////DELETE BANNER/////////////////
+
+const deleteBanner = async (req, res) => {
+    try {
+        const id = req.query.id
+        await bannerSchema.deleteOne({ _id: id })
+        res.redirect('/admin/banner')
+        message = 'banner delted successfully'
+    } catch (error) {
+        console.log(error.message);
+    }
+}
 module.exports = {
     loginLoad,
     adminLogin,
@@ -600,5 +717,11 @@ module.exports = {
     loadEditOffer,
     editOffer,
     deleteOffer,
-   
+    bannersPage,
+    loadAddBanner,
+    addBanner,
+    loadEditBanner,
+    editBanner,
+    deleteBanner
+
 }

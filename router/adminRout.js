@@ -7,6 +7,7 @@ const orderController=require('../controllers/orderController')
 const auth = require('../middleware/authAdmin')
 // const userBlock=require('../middleware/userBlock')
 
+const uploadBanner = multer.bannerMulter()
 const upload = multer.createMulter()
 
 const admin_rout = express()
@@ -98,6 +99,20 @@ admin_rout.get('/editOffer',auth.logOutSession,adminController.loadEditOffer)
 admin_rout.post('/editOffer',auth.logOutSession,adminController.editOffer)
 
 admin_rout.get('/deleteOffer',auth.logOutSession,adminController.deleteOffer)
+
+
+
+admin_rout.get('/banner',auth.logOutSession,adminController.bannersPage)
+
+admin_rout.get('/addBanner',auth.logOutSession,adminController.loadAddBanner)
+
+admin_rout.post('/addBanner',uploadBanner.single('image'),adminController.addBanner)
+
+admin_rout.get('/editBanner',auth.logOutSession,adminController.loadEditBanner)
+
+admin_rout.post('/editBanner',uploadBanner.single('image'),adminController.editBanner)
+
+admin_rout.get('/deleteBanner',auth.logOutSession,adminController.deleteBanner)
 
 
 admin_rout.get("*",auth.logOutSession,adminController.loadAdminHome)

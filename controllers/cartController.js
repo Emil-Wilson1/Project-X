@@ -3,6 +3,7 @@ const categoryModel = require('../models/categoryModel')
 const cartSchema = require('../models/cartModel')
 const productSchema = require('../models/productModel')
 const couponSchema = require('../models/couponModel')
+const bannerSchema = require('../models/bannerModel')
 const path = require('path');
 require('dotenv').config();
 
@@ -18,6 +19,7 @@ const loadHome = async (req, res, next) => {
     try {
 
         const products = await productSchema.find({ is_show: true }).sort({ _id: -1 }).limit(4)
+        const banner= await bannerSchema.findOne()
         // const products = await productSchema.aggregate([
         //     {
         //         $match: { is_show: true }
@@ -59,6 +61,7 @@ const loadHome = async (req, res, next) => {
             session,
             msg, 
             message, 
+            banner,
             counter: counter ? counter[0]?.total || 0 : 0, 
             sweetAlertMessage: null 
         });
