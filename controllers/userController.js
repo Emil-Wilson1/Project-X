@@ -679,6 +679,41 @@ const addNewPassword = async (req, res) => {
 
 
 
+
+const checkAddress = async (req, res, next) => {
+    try {
+        const session = req.session.user_id
+        res.render('checkAddress', { session, message, msg })
+        msg = null
+        message = null
+    } catch (error) {
+        console.log(error.message);
+        next(error.message)
+    }
+}
+
+const addCheckAddress = async (req, res, next) => {
+    try {
+        const id = req.session.user_id
+        const data = req.body
+        if (data.address, data.city, data.district, data.state, data.country) {
+            const userData = await User.findOne({ _id: new Object(id) })
+            userData.address.push(data)
+            await userData.save()
+
+            res.redirect('/checkOut')
+            //message = 'Address added success fully'
+        } else {
+            res.redirect('/addAddress')
+            msg = 'Fill all the fields'
+        }
+    } catch (error) {
+        console.log(error.message);
+        next(error.message)
+    }
+}
+
+
 ///////LOAD ADD NEW ADDRESS/////////////
 
 const addAddress = async (req, res, next) => {
@@ -692,7 +727,6 @@ const addAddress = async (req, res, next) => {
         next(error.message)
     }
 }
-
 
 /////// ADD NEW ADDRESS////////
 
@@ -1681,6 +1715,8 @@ module.exports = {
     addNewAddress,
     loadChekOut,
     addCoupon,
+    checkAddress,
+    addCheckAddress,
     loadSelectAddress,
     loadMoreAddress,
     deleteAddress,

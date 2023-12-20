@@ -308,16 +308,134 @@
                                       </div>
                                     </div>
                                   </div>
+
+                                     <!-- Line Chart -->
+        <div class="row mb-5 container">
+          <div class="col-12 col-lg-6 col-md-12">
+            <h3 class="text-white text-center mt-4">SALES CHART</h3>
+            <div class="" style="background-color: #394e64;" id="reportsChart"></div>
+          </div>
+          <div class="col-12 col-lg-6 col-md-12">
+            <h3 class="text-white text-center mt-4">PRODUCT SALES</h3>
+            <div class="" style="background-color: #394e64;" id="productsReport"></div>
+          </div>
+        </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+
+
+        
+
           <!-- /#page-content-wrapper -->
         </div>
       </body>
       
     
+      <script>
+        document.addEventListener("DOMContentLoaded", () => {
+
+
+
+          const monthlySalesDetails = JSON.parse('<%=monthlySalesReport%>');
+          const monthlyProductSales = JSON.parse('<%=monthlyProductSales%>')
+          new ApexCharts(document.querySelector("#reportsChart"), {
+            series: [{
+              name: 'Sales',
+              data: monthlySalesDetails,
+            }],
+            chart: {
+              height: 350,
+              type: 'area',
+              toolbar: {
+                show: true
+              },
+            },
+            markers: {
+              size: 4
+            },
+            colors: ['#2eca6a', '#2eca6a', '#ff771d'],
+            fill: {
+              type: "gradient",
+              gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.3,
+                opacityTo: 0.4,
+                stops: [0, 90, 100]
+              }
+            },
+            dataLabels: {
+              enabled: true
+            },
+            stroke: {
+              curve: 'smooth',
+              width: 2
+            },
+            xaxis: {
+              categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            },
+            tooltip: {
+              x: {
+                format: 'MMM'
+              },
+              y: {
+                formatter: function (value) {
+                  return '₹' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                }
+              }
+            }
+          }).render();
+
+          new ApexCharts(document.querySelector("#productsReport"), {
+            series: [{
+              name: 'Product Sales',
+              data: monthlyProductSales,
+            }],
+            chart: {
+              height: 350,
+              type: 'bar',
+              toolbar: {
+                show: true
+              },
+            },
+            markers: {
+              size: 4
+            },
+            colors: ['#ff771d', '#2eca6a', '#ff771d'],
+            fill: {
+              type: "bar",
+              gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.3,
+                opacityTo: 0.4,
+                stops: [0, 90, 100]
+              }
+            },
+            dataLabels: {
+              enabled: true
+            },
+            stroke: {
+              curve: 'smooth',
+              width: 2
+            },
+            xaxis: {
+              categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            },
+            tooltip: {
+              x: {
+                format: 'MMM'
+              },
+              y: {
+                formatter: function (value) {
+                  return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                }
+              }
+            }
+          }).render();
+        });
+      </script>
 
       <!-- <body id="reportsPage">
         <div class="d-flex" id="wrapper"> -->

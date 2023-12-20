@@ -72,6 +72,10 @@ user_route.get('/addAddress',auth.logOutSession,userController.addAddress)
 
 user_route.post('/addAddress',auth.logOutSession,userController.addNewAddress)
 
+user_route.get('/checkAddress',auth.logOutSession,userController.checkAddress)
+
+user_route.post('/checkAddress',auth.logOutSession,userController.addCheckAddress)
+
 user_route.get('/selectAddress',auth.logOutSession,userController.loadSelectAddress)
 
 user_route.get('/moreAddress',auth.logOutSession,userController.loadMoreAddress)

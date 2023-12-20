@@ -86,8 +86,45 @@ const loadAdminHome = async (req, res) => {
             { $match: { date: { $gte: yearAgo } } },
             { $group: { _id: null, totalSales: { $sum: '$totalSales' }, totalItemsSold: { $sum: '$totalItemsSold' } } }
         ]);
+
+        const yearlyStart = new Date(new Date().getFullYear(), 0, 1);
+        const yearlyEnd = new Date(new Date().getFullYear(), 11, 31);
+        let salesOfMonth
+        let totalSalesOfMonth
+        const yearlySalesData = await salesSchema.find({
+            date: {
+                $gte: yearlyStart,
+                $lte: yearlyEnd,
+            },
+        })
+
+        const monthlySalesDetails = [];
+        const monthlyProducSales = []
+        for (let i = 0; i < 12; i++) {
+            salesOfMonth = yearlySalesData.filter((order) => {
+                return order.date.getMonth() === i;
+            });
+
+
+            totalSalesOfMonth = salesOfMonth.reduce((total, order) => {
+                return (
+                    total += order.totalSales
+                )
+            }, 0);
+            let proCount
+            proCount = 0
+            productSalesOfMonth = salesOfMonth.reduce((total, order) => {
+
+                return (
+                    proCount += order.totalItemsSold
+                )
+            }, 0);
+
+            monthlySalesDetails.push(totalSalesOfMonth);
+            monthlyProducSales.push(productSalesOfMonth)
+        }
         const orders = await orderSchema.find().populate('userId').populate('item.product');
-        res.render('home', { message, usersLength, msg, orders, dailySalesReport, weeklySalesReport, yearlySalesReport });
+        res.render('home', { message, usersLength, msg, orders, dailySalesReport, weeklySalesReport, yearlySalesReport,monthlySalesReport: JSON.stringify(monthlySalesDetails), monthlyProductSales: JSON.stringify(monthlyProducSales) });
         message = null;
     } catch (error) {
         console.log(error);
@@ -225,7 +262,7 @@ const loadSalesPage = async (req, res) => {
                 })
                 .countDocuments();
         } else {
-            // If no start and end date provided, fetch all sales data
+            
             sales = await salesSchema
                 .find()
                 .populate('userId')
@@ -492,21 +529,21 @@ const loadAddOffer = async (req, res) => {
 
 const addOffer = async (req, res) => {
     try {
-        const { categoryId, maxDiscount, minPurchase } = req.body; // Assuming categoryId is sent from the form
+        const { categoryId, maxDiscount, minPurchase } = req.body; 
 
-        // Fetch the category from the database using the provided categoryId
+        
         const existingOffer = await offerSchema.findOne({ category: categoryId });
 
         if (existingOffer) {
-            // If an offer already exists for this category, handle accordingly
+            
             return res.status(400).send('An offer already exists for this category');
         }
         const newOffer = new offerSchema({
-            category: categoryId, // Reference to the existing category object
+            category: categoryId, 
             maxDiscount: maxDiscount,
             status: true,
             minPurchase: minPurchase
-            // Other offer properties if needed
+            
         });
 
         await newOffer.save();
@@ -537,7 +574,7 @@ const editOffer = async (req, res) => {
         const { id } = req.query;
         const { categoryId, maxDiscount, minPurchase } = req.body;
 
-        // Fetch the offer from the database using the provided ID
+        
         const existingOffer = await offerSchema.findById(id);
 
         if (!existingOffer) {
@@ -545,7 +582,7 @@ const editOffer = async (req, res) => {
         }
         const categoryHasOffer = await offerSchema.exists({ category: categoryId });
 
-        // Fetch the current category associated with the offer
+        
         const currentCategory = await categorySchema.findById(existingOffer.category);
 
         if (categoryHasOffer && currentCategory._id.toString() !== categoryId) {
@@ -555,12 +592,11 @@ const editOffer = async (req, res) => {
 
         } else {
 
-            // Update the offer properties
+            
             existingOffer.category = categoryId;
             existingOffer.maxDiscount = maxDiscount;
             existingOffer.minPurchase = minPurchase;
 
-            // Save the updated offer
             await existingOffer.save();
 
             res.redirect('/admin/Offer'); // Redirect to the offer management page
