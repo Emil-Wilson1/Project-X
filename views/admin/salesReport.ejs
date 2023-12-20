@@ -452,6 +452,7 @@ crossorigin="anonymous"></script>
     <button type="submit">Filter</button>
     <button type="button" id="resetFilter"><a href="/admin/salesReport" class="text-dark ">Reset</a></button> <!-- Button to reset filters -->
   </form>
+  <div id="errorMessages" style="color: red;"></div>
                                 
                                  
                               </div>
@@ -476,7 +477,7 @@ crossorigin="anonymous"></script>
                                     <tr>
                                        
                                         <td><%=x+i%></td>
-                                        <td><%=sales.userId.username%></td>
+                                        <td><%= sales.userId && sales.userId.username ? sales.userId.username : 'N/A' %></td>
                                         <td><%=sales.location%></td>
                                         <td><%=sales.date.toDateString()%></td>                        
                                         <td><%=sales.totalSales%></td>
@@ -526,7 +527,39 @@ crossorigin="anonymous"></script>
 <script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
 
 
+<script>
+  const form = document.getElementById('dateFilterForm');
 
+  form.addEventListener('submit', function (event) {
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const errors = [];
+
+    const startDate = new Date(startDateInput.value);
+    const endDate = new Date(endDateInput.value);
+
+    if (startDate.getTime() >= endDate.getTime()) {
+      errors.push('Start date should be before the end date.');
+    }
+
+    if (startDateInput.value.trim() === '') {
+      errors.push('Please enter a start date.');
+    }
+
+    if (endDateInput.value.trim() === '') {
+      errors.push('Please enter an end date.');
+    }
+
+    if (errors.length > 0) {
+      event.preventDefault(); 
+      const errorMessagesElement = document.getElementById('errorMessages');
+      errorMessagesElement.innerHTML = errors.join('<br>'); 
+    } else {
+      const errorMessagesElement = document.getElementById('errorMessages');
+      errorMessagesElement.innerHTML = ''; 
+    }
+  });
+</script>
 <script>
 
 
