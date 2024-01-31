@@ -387,9 +387,61 @@
                         }
 
                         function filtersearch() {
-                            search = $('#search').val()
-                            submit(categorys, search, filterprice)
+                            event.preventDefault();
+
+                            const search = $('#search').val();
+                            // Retrieve other filter parameters like categorys and filterprice
+                            $.ajax({
+                                url: '/shopFilter',
+                                type: 'post',
+                                dataType: 'json',
+                                contentType: 'application/json',
+                                data: JSON.stringify({ categorys, filterprice, search }),
+                                success: (res) => {
+                                    let html = []
+                                    if (res.Data) {
+                                        $('#Filter').html('')
+                                        res.Data.forEach(value => {
+                                            value.forEach((item, i) => {
+                                                html += `<div class="col-lg-4 col-md-6">
+                        <div class="product__item">
+                            <div class="product__item__pic set-bg" data-setbg="">
+                                <a href="/singleProduct?id=${item._id}"><img
+                                        src="/proImage/${item.image[0].toString('utf8')}" alt=""></a>
+                                        
+                                <ul class="product__hover">
+                                    <li><a href="/proImage/${item.image[0].toString('utf8')}" class="image-popup"><span class="arrow_expand"></span></a></li>
+                                    <li><a href="/addToWishlist?id=${item._id}"><span class="icon_heart_alt"></span></a></li>
+                                    <li><a href="/addToCart?id=${item._id}"><span class="icon_bag_alt"></span></a></li>
+                                </ul>
+                            </div>
+                            <div class="product__item__text">
+                                <h6><a href="#">${item.title}</a></h6>
+                                <div class="rating">
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                    <i class="fa fa-star"></i>
+                                </div>
+                                <div class="product__price">₹ ${item.price}</div>
+                            </div>
+                        </div>
+                    </div> `
+
+                                            })
+
+                                        });
+                                        $('#Filter').html(html);
+                                    }
+                                },
+                                error: function (err) {
+                                    console.error('Error:', err);
+                                }
+                            });
                         }
+
+
 
 
                         function price(check) {

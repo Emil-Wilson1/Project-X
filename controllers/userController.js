@@ -155,24 +155,24 @@ const referralSubmit = async (req, res, next) => {
             await User.updateOne({ _id: user._id }, { $inc: { wallet: 100 } });
             await User.updateOne({ _id: session }, { $inc: { wallet: 50 } });
             await User.updateOne({ _id: session }, { $set: { redeemed: true } });
-       // Create wallet history entries for both users' transactions
+
        const creditedEntryUser1 = new walletHistory({
-        user: user._id, // Assuming user1._id represents the user1's ID
-        transactionType: 'Referral Bonus', // You can define a transaction type for crediting
+        user: user._id, 
+        transactionType: 'Referral Bonus', 
         amount: 100,
-        transactionDate: new Date() // Set transaction date as current date/time
-        // Add other fields as per your schema definition
+        transactionDate: new Date() 
+       
     });
 
     const creditedEntryUser2 = new walletHistory({
-        user: session, // Assuming 'session' represents user2's ID
-        transactionType: 'Referral Bonus', // You can define a transaction type for crediting
+        user: session, 
+        transactionType: 'Referral Bonus', 
         amount: 50,
-        transactionDate: new Date() // Set transaction date as current date/time
-        // Add other fields as per your schema definition
+        transactionDate: new Date() 
+       
     });
 
-    // Save the wallet history entries for both users' transactions
+   
     await creditedEntryUser1.save();
     await creditedEntryUser2.save();
             console.log("100 credited");
@@ -599,7 +599,7 @@ const sendResetPasswordMail = async (name, email, token) => {
             from: "emilwilson67@gmail.com",
             to: email,
             subject: 'For Change Password',
-            html: `<p>Hii ${name}, please click <a href="http://localhost:3001/resetpass?token=${token}">here</a> to verify your email.</p>`,
+            html: `<p>Hii ${name}, please click <a href="http://localhost:3000/resetpass?token=${token}">here</a> to verify your email.</p>`,
         }
 
         transporter.sendMail(mailOption, (error, info) => {

@@ -134,7 +134,7 @@ user_route.get('/addToWishlist',auth.logOutSession,cartController.addToWishlist)
 user_route.get('/removeWishlist',auth.logOutSession,cartController.removeWishlist)
 
 
-// user_route.post('/shopFilter',userController.productFilter)
+ user_route.post('/shopFilter',cartController.productFilter)
 
 
 module.exports = user_route

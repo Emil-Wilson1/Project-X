@@ -126,111 +126,172 @@ const loadShopPage = async (req, res, next) => {
     }
 }
 
+// const productFilter = async (req, res, next) => {
+//     try {
+
+//         let product
+//         let products = []
+//         let Categorys
+//         let Data = []
+
+//         const { categorys, search, filterprice } = req.body
+
+
+//         if (!search) {
+//             if (filterprice != 0) {
+//                 if (filterprice.length == 2) {
+//                     product = await productSchema.find({
+//                         is_show: true,
+//                         $and: [
+//                             { price: { $lte: Number(filterprice[1]) } },
+//                             { price: { $gte: Number(filterprice[0]) } }
+//                         ]
+
+//                     }).populate('category')
+//                 } else {
+//                     product = await productSchema.find({
+//                         is_show: true,
+//                         $and: [
+//                             { price: { $gte: Number(filterprice[0]) } }
+//                         ]
+
+//                     }).populate('category')
+//                 }
+//             } else {
+//                 product = await productSchema.find({ is_show: true }).populate('category')
+//             }
+
+//         } else {
+
+//             if (filterprice != 0) {
+//                 if (filterprice.length == 2) {
+//                     product = await productSchema.find({
+//                         is_show: true,
+//                         $and: [
+//                             { price: { $lte: Number(filterprice[1]) } },
+//                             { price: { $gte: Number(filterprice[0]) } },
+//                             {
+//                                 $or: [
+//                                     { brand: { $regex: '.*' + search + '.*', $options: 'i' } },
+//                                     { title: { $regex: '.*' + search + '.*', $options: 'i' } }
+//                                 ]
+//                             }
+//                         ]
+
+//                     }).populate('category')
+//                 } else {
+//                     product = await productSchema.find({
+//                         is_show: true,
+//                         $and: [
+//                             { price: { $gte: Number(filterprice[0]) } },
+//                             {
+//                                 $or: [
+//                                     { brand: { $regex: '.*' + search + '.*', $options: 'i' } },
+//                                     { title: { $regex: '.*' + search + '.*', $options: 'i' } }
+//                                 ]
+//                             }
+//                         ]
+
+//                     }).populate('category')
+//                 }
+//             } else {
+//                 product = await productSchema.find({
+//                     is_show: true,
+//                     $or: [
+//                         { brand: { $regex: '.*' + search + '.*', $options: 'i' } },
+//                         { title: { $regex: '.*' + search + '.*', $options: 'i' } }
+//                     ]
+//                 }).populate('category')
+//             }
+
+
+//         }
+
+//         Categorys = categorys.filter((value) => {
+//             return value !== null
+//         })
+//         if (Categorys[0]) {
+
+//             Categorys.forEach((element, i) => {
+//                 products[i] = product.filter((value) => {
+//                     return value.category.category == element
+//                 })
+//             });
+//             products.forEach((value, i) => {
+//                 Data[i] = value.filter((v) => {
+//                     return v
+//                 })
+//             })
+//         } else {
+//             Data[0] = product
+//         }
+//         res.json({ Data })
+//     } catch (error) {
+//         console.log(error.message);
+//         next(error.message)
+//     }
+// }
+
 const productFilter = async (req, res, next) => {
     try {
+        let product;
+        let products = [];
+        let Categorys;
+        let Data = [];
 
-        let product
-        let products = []
-        let Categorys
-        let Data = []
+        const { categorys, search, filterprice } = req.body;
 
-        const { categorys, search, filterprice } = req.body
+        let query = { is_show: true };
 
-
-        if (!search) {
-            if (filterprice != 0) {
-                if (filterprice.length == 2) {
-                    product = await productSchema.find({
-                        is_show: true,
-                        $and: [
-                            { price: { $lte: Number(filterprice[1]) } },
-                            { price: { $gte: Number(filterprice[0]) } }
-                        ]
-
-                    }).populate('category')
-                } else {
-                    product = await productSchema.find({
-                        is_show: true,
-                        $and: [
-                            { price: { $gte: Number(filterprice[0]) } }
-                        ]
-
-                    }).populate('category')
-                }
-            } else {
-                product = await productSchema.find({ is_show: true }).populate('category')
-            }
-
-        } else {
-
-            if (filterprice != 0) {
-                if (filterprice.length == 2) {
-                    product = await productSchema.find({
-                        is_show: true,
-                        $and: [
-                            { price: { $lte: Number(filterprice[1]) } },
-                            { price: { $gte: Number(filterprice[0]) } },
-                            {
-                                $or: [
-                                    { brand: { $regex: '.*' + search + '.*', $options: 'i' } },
-                                    { title: { $regex: '.*' + search + '.*', $options: 'i' } }
-                                ]
-                            }
-                        ]
-
-                    }).populate('category')
-                } else {
-                    product = await productSchema.find({
-                        is_show: true,
-                        $and: [
-                            { price: { $gte: Number(filterprice[0]) } },
-                            {
-                                $or: [
-                                    { brand: { $regex: '.*' + search + '.*', $options: 'i' } },
-                                    { title: { $regex: '.*' + search + '.*', $options: 'i' } }
-                                ]
-                            }
-                        ]
-
-                    }).populate('category')
-                }
-            } else {
-                product = await productSchema.find({
-                    is_show: true,
-                    $or: [
-                        { brand: { $regex: '.*' + search + '.*', $options: 'i' } },
-                        { title: { $regex: '.*' + search + '.*', $options: 'i' } }
-                    ]
-                }).populate('category')
-            }
-
-
+        if (search) {
+            const searchRegex = new RegExp(search, 'i');
+            query.$or = [
+                { brand: { $regex: searchRegex } },
+                { title: { $regex: searchRegex } }
+            ];
         }
+
+        if (filterprice != 0) {
+            if (filterprice.length == 2) {
+                query.price = {
+                    $gte: Number(filterprice[0]),
+                    $lte: Number(filterprice[1])
+                };
+            } else {
+                query.price = { $gte: Number(filterprice[0]) };
+            }
+        }
+
+        product = await productSchema.find(query).populate('category');
 
         Categorys = categorys.filter((value) => {
-            return value !== null
-        })
-        if (Categorys[0]) {
+            return value !== null;
+        });
 
+        if (Categorys[0]) {
             Categorys.forEach((element, i) => {
                 products[i] = product.filter((value) => {
-                    return value.category.category == element
-                })
+                    return value.category.category == element;
+                });
             });
+
             products.forEach((value, i) => {
                 Data[i] = value.filter((v) => {
-                    return v
-                })
-            })
+                    return v;
+                });
+            });
         } else {
-            Data[0] = product
+            Data[0] = product;
         }
-        res.json({ Data })
+
+        res.json({ Data });
     } catch (error) {
         console.log(error.message);
-        next(error.message)
+        next(error.message);
     }
-}
+};
+
+
 
 
 // LOAD CART
