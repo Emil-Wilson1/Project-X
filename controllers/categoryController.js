@@ -2,6 +2,7 @@ const categorySchema = require('../models/categoryModel')
 const productSchema = require('../models/productModel')
 const path = require('path');
 require('dotenv').config();
+const bcrypt = require('bcrypt')
 
 let msg
 let message

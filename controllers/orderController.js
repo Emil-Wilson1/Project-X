@@ -5,6 +5,7 @@ const orderSchema = require('../models/orderModel')
 const salesSchema=require('../models/salesReport')
 const couponSchema = require('../models/couponModel')
 const offerSchema=require('../models/offerModel')
+const bcrypt = require('bcrypt')
 const path = require('path');
 require('dotenv').config();
 

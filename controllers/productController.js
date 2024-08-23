@@ -1,5 +1,6 @@
 const categorySchema = require('../models/categoryModel')
 const productSchema = require('../models/productModel')
+const bcrypt = require('bcrypt')
 const sharp = require('sharp')
 const path = require('path');
 require('dotenv').config();

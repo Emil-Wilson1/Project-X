@@ -4,6 +4,7 @@ const cartSchema = require('../models/cartModel')
 const productSchema = require('../models/productModel')
 const couponSchema = require('../models/couponModel')
 const bannerSchema = require('../models/bannerModel')
+const bcrypt = require('bcrypt')
 const path = require('path');
 require('dotenv').config();
 

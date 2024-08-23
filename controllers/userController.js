@@ -102,39 +102,7 @@ const referral = async (req, res, next) => {
         next(error.message)
     }
 }
-// const referralSubmit = async (req, res, next) => {
-//     try {
-//         const referer = req.body.ref
-//         const session = req.session.user_id
-//         console.log(session)
 
-//         const user = await User.find({referalId:referer})
-
-//         const redeemed=await User.find({_id:session},{redeemed:false})
-//         console.log(redeemed);
-//         console.log(user)
-//         if (referer.trim() == 0) {
-//             res.redirect("/referral")
-//             msg = "Please enter the code"
-
-//         }else if (user  && redeemed) {
-//             await User.updateMany({ _id: user._id }, { $inc: { wallet: 100 } })
-//             await User.updateOne({ _id: session }, { $inc: { wallet: 50 } })
-//             await User.updateOne({_id:session},{$set:{redeemed:true}})
-//             console.log("100 credited");
-//             res.redirect("/userProfile")
-//             message = "Successfully Redeemed"
-//         } else {
-//             res.redirect("/referral")
-//             msg = "Incorrect Code!"
-//         }
-
-
-//         console.log("ty")
-//     } catch (error) {
-//         console.log(error);
-//     }
-// }
 
 const referralSubmit = async (req, res, next) => {
     try {
@@ -599,7 +567,7 @@ const sendResetPasswordMail = async (name, email, token) => {
             from: "emilwilson67@gmail.com",
             to: email,
             subject: 'For Change Password',
-            html: `<p>Hii ${name}, please click <a href="http://localhost:3000/resetpass?token=${token}">here</a> to verify your email.</p>`,
+            html: `<p>Hii ${name}, please click <a href="https://finito.fun/resetpass?token=${token}">here</a> to verify your email.</p>`,
         }
 
         transporter.sendMail(mailOption, (error, info) => {
@@ -631,30 +599,7 @@ const newPassword = async (req, res) => {
 }
 
 
-// const addNewPassword = async (req, res) => {
-//     try {
-//         const password = req.body.password
-//         const Rpassword = req.body.Rpassword
-//         console.log(password)
-//         console.log(Rpassword)
-//         const user = req.body.username
-//         console.log(user)
-//         if (password == Rpassword) {
-//             const secure = await securePassword(password)
-//             console.log(secure)
-//             const userData = await User.updateOne({ username: user }, { $set: { password: secure, token: '' } })
-//             console.log(userData)
 
-//             res.redirect('/login')
-//         } else {
-//             res.redirect('/restpass')
-//             msg = "Entered password is not matching!!"
-//         }
-//     } catch (error) {
-//         console.log(error.message)
-//         // res.render('user/505');
-//     }
-// }
 
 const addNewPassword = async (req, res) => {
     try {
@@ -1157,135 +1102,6 @@ const changePswd = async (req, res, next) => {
 
 
 
-// const orderConfirm = async (req, res, next) => {
-
-//     try {
-//         let payMoney
-//         const session = req.session.user_id
-//         const payment = req.body
-//         paymentMethod = payment.flexRadioDefault
-//         let offer
-//         let maxDiscount = 0;
-//         let dis;
-//         //const cart = await cartSchema.findOne({ userId: session })
-//         const user = await User.findOne({ _id: session })
-
-//         const cart = await cartSchema
-//             .findOne({ userId: session })
-//             .populate({
-//                 path: 'item.product',
-//                 populate: {
-//                     path: 'category',
-//                     model: 'category' // Assuming 'category' is the model name for the category schema
-//                 }
-//             });
-
-//         for (const item of cart.item) {
-//             const categoryId = item.product.category._id; // Assuming '_id' is the ID field of the category
-
-//             // Check if there is an offer for the category
-//             offer = await offerSchema.findOne({ category: categoryId });
-
-//             if (offer) {
-//                 maxDiscount = offer.maxDiscount;
-//                 console.log(`Category ${categoryId} has a maximum discount of ${maxDiscount}`);
-//                 // Perform further operations with the maxDiscount value or the offer data
-//                     payMoney = parseInt(cart.totalPrice) - maxDiscount
-
-//         }
-//     }
-
-//         if (cart.couponDiscount) {
-//             payMoney = parseInt(cart.totalPrice) - cart.couponDiscount
-//         } else {
-//             payMoney = parseInt(cart.totalPrice)
-//         }
-
-
-
-
-
-//         req.session.payMoney = payMoney
-//         if (payment.flexRadioDefault == 'cashOn') {
-//             if (user.wallet) {
-//                 if (user.wallet >= payMoney) {
-//                     await User.findByIdAndUpdate({ _id: session }, { $inc: { wallet: -payMoney } })
-//                 } else {
-//                     await User.findByIdAndUpdate({ _id: session }, { $set: { wallet: 0 } })
-//                 }
-//             }
-//             orderStatus = 1
-//             res.redirect('/userProfile')
-//             message = 'Your order started shipping'
-//         } else if (payment.flexRadioDefault == 'Wallet') {
-//             if (user.wallet) {
-//                 if (user.wallet >= payMoney) {
-//                     await User.findByIdAndUpdate({ _id: session }, { $inc: { wallet: -payMoney } })
-//                 } else {
-//                     await User.findByIdAndUpdate({ _id: session }, { $set: { wallet: 0 } })
-//                 }
-//             }
-//             orderStatus = 1
-//             res.redirect('/userProfile')
-//             message = 'Your order started shipping'
-//         } else if (payment.flexRadioDefault == 'online') {
-//             if (user.wallet) {
-//                 payMoney = payMoney - user.wallet
-//             }
-//             const currencyMap = {
-//                 840: "USD",
-//                 978: "EUR",
-//                 826: "GBP",
-//             };
-//             const currencyCode = currencyMap["840"];
-
-//             const amount = {
-//                 currency: currencyCode,
-//                 total: payMoney,
-//             };
-
-
-//             const create_payment_json = {
-//                 intent: "sale",
-//                 payer: {
-//                     payment_method: "paypal",
-//                 },
-//                 redirect_urls: {
-//                     return_url: process.env.SITE_URL + "/success",
-//                     cancel_url: process.env.SITE_URL + "/checkout",
-//                 },
-//                 transactions: [
-//                     {
-//                         amount,
-//                         description: "Washing Bar soap",
-//                     },
-//                 ],
-//             };
-
-//             paypal.payment.create(create_payment_json, function (error, payment) {
-//                 if (error) {
-//                     throw error;
-//                 } else {
-//                     for (let i = 0; i < payment.links.length; i++) {
-//                         if (payment.links[i].rel === "approval_url") {
-//                             res.redirect(payment.links[i].href);
-//                         }
-//                     }
-//                 }
-//             });
-
-//         } else {
-//             res.redirect('/placeOrder')
-//             msg = 'Please select any payment option'
-//         }
-//     } catch (error) {
-//         console.log(error);
-//         next(error.message)
-//     }
-
-// }
-
-
 const orderConfirm = async (req, res, next) => {
     try {
         let payMoney;
@@ -1685,7 +1501,7 @@ const wallet = async (req, res) => {
         // Fetch wallet history data from the database (replace this with your logic)
         const WalletHistory = await walletHistory.find({ user: session }).exec();
 
-        // Pass wallet history data to the EJS template for rendering
+        
         res.render('walletHistory', { WalletHistory, session });
     } catch (error) {
         console.error(error);
